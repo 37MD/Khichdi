@@ -7167,8 +7167,10 @@ ${Math.abs(diff) < 0.05 ? 'Tied' : (aWins ? nameA : nameB) + ' outperforms by ' 
                             el.disabled = true;
                         }
                     });
-                } catch (e) {
-                     }
+                    } catch (e) {
+                        const _ovTxt2 = document.getElementById('ovTxt');
+                        if (_ovTxt2) { _ovTxt2.textContent = `⚠ ${fund.name.slice(0,20)}: ${e.message.slice(0,40)}`; }
+                    }
             }
             function runStressTest() {
                 const scenario = document.getElementById('stressSelect').value;
@@ -10041,6 +10043,10 @@ function buildWeeklyRsiFast(allPrices, period = 4, allDates = null) {
                     try {
                         const _cb2 = `t=${Date.now()}`;
                         const url = (fund.code.startsWith('SM') ? `https://npsnav.in/api/historical/${fund.code}` : `https://api.mfapi.in/mf/${fund.code}`) + `?${_cb2}`;
+                        const res = await fetch(url);
+                        const data = await res.json();
+                        if (!data?.data) return;
+                        const validData = [...data.data].reverse().filter(d => Number.isFinite(parseFloat(d.nav)) && parseFloat(d.nav) > 0) ;
                         const prices = validData.map(d => parseFloat(d.nav));
                         const dates  = validData.map(d => window.normalizeDate(d.date));
                         if (prices.length < 80) return;
@@ -17691,16 +17697,19 @@ const ALL_INDICES = [{
 }];
 const PROXY = "https://corsproxy.io/?";
 const PROXY_LIST = [
+  "",  // direct fetch first (may work from some origins)
   "https://corsproxy.io/?",
   "https://api.allorigins.win/raw?url=",
-  "https://corsproxy.io/?"
+  "https://api.codetabs.com/v1/proxy?quest=",
+  "https://thingproxy.freeboard.io/fetch/"
 ];
 let _proxyIdx = 0;
 async function _fetchWithFallback(url, opts) {
   for (let attempt = 0; attempt < PROXY_LIST.length; attempt++) {
     const px = PROXY_LIST[(_proxyIdx + attempt) % PROXY_LIST.length];
     try {
-      const r = await fetch(px + encodeURIComponent(url), opts);
+      const targetUrl = px ? px + encodeURIComponent(url) : url;
+      const r = await fetch(targetUrl, opts);
       if (r.ok) return r;
       if (r.status === 429 || r.status === 403) {
         _proxyIdx = (_proxyIdx + 1) % PROXY_LIST.length;
