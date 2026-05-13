@@ -16920,8 +16920,9 @@ Return a JSON object with this exact structure:
     };
     </script>
     <div id="ld-scn-overlay" style="display:none;position:fixed;inset:0;z-index:9999;overflow-y:auto;background:#fff;">
-      <div style="position:sticky;top:0;text-align:right;padding:4px 8px;background:rgba(242,245,249,0.97);border-bottom:1px solid #b0bece;z-index:200;">
-        <button onclick="window.closeLDScanner()" style="background:#c8102e;color:#fff;border:none;padding:4px 14px;font-weight:700;font-size:12px;cursor:pointer;font-family:'Space Mono',monospace;">&#x2715; CLOSE</button>
+      <div style="position:sticky;top:0;text-align:right;padding:4px 8px;background:rgba(242,245,249,0.97);border-bottom:1px solid #b0bece;z-index:200;display:flex;align-items:center;justify-content:space-between;">
+        <span id="scnResultCount" style="font-size:0.55rem;color:#888;font-family:'Space Mono',monospace;padding:0 6px;"></span>
+        <button onclick="window.closeLDScanner()" style="background:#c8102e;color:#fff;border:none;padding:4px 14px;font-weight:700;font-size:12px;cursor:pointer;font-family:'Space Mono',monospace;">✕ CLOSE</button>
       </div>
       <div id="ld-scn-root"></div>
     </div>
@@ -17227,9 +17228,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
 })();
 </script>
     <script>
+    function _updateScnCount() {
+      const el = document.getElementById('scnResultCount');
+      if (!el) return;
+      try {
+        const raw = localStorage.getItem('ld_scn_results_cache');
+        if (!raw) { el.textContent = ''; return; }
+        const data = JSON.parse(raw);
+        const keys = Object.keys(data);
+        const ok = keys.filter(k => data[k] && !data[k].error && data[k].wRsi != null).length;
+        el.textContent = ok + '/' + keys.length + ' OK';
+      } catch(e) { el.textContent = ''; }
+    }
     window.openLDScanner = function() {
       document.getElementById('ld-scn-overlay').style.display = 'block';
       document.body.style.overflow = 'hidden';
+      _updateScnCount();
       if (!window._scnMounted && window.LDScannerComponent) {
         window._scnMounted = true;
         ReactDOM.createRoot(document.getElementById('ld-scn-root'))
@@ -18461,20 +18475,7 @@ function LDScanner() {
     value: "FAKE SUPPORT"
   }, "\uD83D\uDD34 Fake"), /*#__PURE__*/React.createElement("option", {
     value: "ABORT"
-  }, "\uD83D\uDC80 Abort")), !scanning ? /*#__PURE__*/React.createElement("span", {
-    style: {
-      display: "inline-flex",
-      alignItems: "center",
-      gap: 4
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 9,
-      color: "#888",
-      fontFamily: "'Space Mono','Courier New',monospace",
-      whiteSpace: "nowrap"
-    }
-  }, Object.keys(results).filter(k => results[k] && !results[k].error && results[k].wRsi != null).length + "/" + ALL_INDICES.filter(i => i.symbol).length + " OK"), /*#__PURE__*/React.createElement("button", {
+  }, "\uD83D\uDC80 Abort")), !scanning ? /*#__PURE__*/React.createElement("button", {
     style: {
       background: accent,
       border: "none",
