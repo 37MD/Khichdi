@@ -13867,12 +13867,11 @@ categories.forEach(cat => {
         
         
         const GEMINI_CASCADE = [
-            geminiModel,                        // user-selected (default: 3.1-flash-lite)
+            geminiModel,                        // user-selected
             'gemini-3.1-flash-lite',            // tier 1 fallback
             'gemini-3-flash',                   // tier 2
             'gemini-3.1-pro',                   // tier 3
-            'gemini-2.5-flash-lite',            // tier 4 legacy fallback
-            'gemini-2.5-flash',                 // tier 5 legacy fallback
+            'gemini-2.5-flash-lite',            // tier 4
         ];
 
         async function callGemini(prompt, useSearch = false) {
@@ -14578,6 +14577,7 @@ Return a JSON object with this exact structure:
                     <option value="gemini-3.1-flash-lite">3.1 Flash-Lite ⚡ (default)</option>
                     <option value="gemini-3-flash">3.0 Flash 🚀</option>
                     <option value="gemini-3.1-pro">3.1 Pro 🔬</option>
+                    <option value="gemini-2.5-flash-lite">2.5 Flash-Lite ⚡</option>
                     <option value="gemini-2.5-flash-lite">2.5 Flash-Lite (fallback)</option>
                     <option value="gemini-2.5-flash">2.5 Flash (fallback)</option>
                 </select>
@@ -14692,12 +14692,12 @@ Return a JSON object with this exact structure:
         const input = document.getElementById('ld-ai-input');
         const submit = document.getElementById('ld-ai-submit');
         
-        const GEMINI_MODEL_DEFAULT = 'gemini-3.1-flash-lite';
+        const GEMINI_MODEL_DEFAULT = 'gemini-2.5-flash';
 
         const modelSelect = document.getElementById('ld-gemini-model-select');
         let savedModel = localStorage.getItem('ld_gemini_model') || GEMINI_MODEL_DEFAULT;
         // Migrate old 2.5 default → new 3.1 default
-        const _validModels = ['gemini-3.1-flash-lite','gemini-3-flash','gemini-3.1-pro','gemini-2.5-flash-lite','gemini-2.5-flash'];
+        const _validModels = ['gemini-2.5-flash','gemini-2.5-flash-lite','gemini-2.0-flash','gemini-2.0-flash-lite'];
         if (!_validModels.includes(savedModel)) { savedModel = GEMINI_MODEL_DEFAULT; try { localStorage.setItem('ld_gemini_model', savedModel); } catch(_){} }
         if (modelSelect) {
             modelSelect.value = savedModel;
@@ -16268,7 +16268,7 @@ Return a JSON object with this exact structure:
         
         const userModel = getModel();
         const MODEL_CASCADE = (() => {
-            const ALL = ['gemini-3.1-flash-lite','gemini-3-flash','gemini-3.1-pro','gemini-2.5-flash-lite','gemini-2.5-flash'];
+            const ALL = ['gemini-3.1-flash-lite','gemini-3-flash','gemini-3.1-pro','gemini-2.5-flash-lite'];
             const startIdx = ALL.indexOf(userModel);
             return startIdx === -1 ? ALL : ALL.slice(startIdx);
         })();
@@ -18072,7 +18072,7 @@ function LDScanner() {
         responseMimeType: "application/json"
       }
     };
-    for (const m of ["gemini-3.1-flash-lite", "gemini-3-flash", "gemini-3.1-pro", "gemini-2.5-flash-lite", "gemini-2.5-flash"]) {
+    for (const m of ["gemini-3.1-flash-lite", "gemini-3-flash", "gemini-3.1-pro", "gemini-2.5-flash-lite"]) {
       try {
         const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${key}`, {
           method: "POST",
