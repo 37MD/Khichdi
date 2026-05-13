@@ -17697,7 +17697,6 @@ const ALL_INDICES = [{
 }];
 const PROXY = "https://corsproxy.io/?";
 const PROXY_LIST = [
-  "",  // direct fetch first (may work from some origins)
   "https://corsproxy.io/?",
   "https://api.allorigins.win/raw?url=",
   "https://api.codetabs.com/v1/proxy?quest=",
@@ -17840,9 +17839,27 @@ async function fetchIdx(symbol) {
     const wkD = wkR?.ok ? await wkR.json() : null,
       dD = dR?.ok ? await dR.json() : null,
       qtD = qtR?.ok ? await qtR.json() : null;
-    const wC = wkD?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
-    const dC = dD?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
-    const q = qtD?.quoteResponse?.result?.[0] || null;
+    let wC = wkD?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
+    let dC = dD?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
+    let q = qtD?.quoteResponse?.result?.[0] || null;
+    // Fallback to stooq.com if Yahoo CORS blocked (stooq supports CORS on mobile)
+    if (!wC.length && !dC.length) {
+      try {
+        const stooqSym = symbol.replace(/\.(NS|BO)$/,'').replace('^','').toLowerCase();
+        const stooqUrl = `https://stooq.com/q/d/l/?s=${stooqSym}&i=d`;
+        const stooqRes = await fetch(stooqUrl, { signal: AbortSignal.timeout(6000) });
+        if (stooqRes.ok) {
+          const csv = await stooqRes.text();
+          const lines = csv.trim().split('\n').slice(1);
+          const closes = lines.map(l => { const c = parseFloat(l.split(',')[4]); return isNaN(c) ? null : c; }).filter(c => c !== null);
+          if (closes.length > 20) {
+            dC = closes;
+            wC = closes.filter((_, i) => i % 5 === 4 || i === closes.length - 1);
+            q = { regularMarketPrice: closes[closes.length - 1] };
+          }
+        }
+      } catch(_stq) { /* stooq fallback failed */ }
+    }
     const price = q?.regularMarketPrice ?? (wC.length ? wC[wC.length - 1] : null);
     const vd = dC.filter(x => x != null && !isNaN(x));
     const changePct = vd.length >= 2 ? parseFloat(((vd[vd.length - 1] - vd[vd.length - 2]) / vd[vd.length - 2] * 100).toFixed(2)) : null;
@@ -18584,7 +18601,7 @@ function LDScanner() {
     if (!r.wRsi && !r.error) return null;
     if (r.error) return /*#__PURE__*/React.createElement("tr", { key: r.symbol, style: { background: "#fff8f8" } },
       /*#__PURE__*/React.createElement("td", { style: { ...td1S, color: red, fontSize: 10 } }, r.name),
-      /*#__PURE__*/React.createElement("td", { colSpan: 14, style: { ...tdS, color: "#c8102e", fontSize: 10, fontStyle: "italic" } }, "⚠ fetch error — CORS block or Yahoo timeout. Retry scan.")
+      /*#__PURE__*/React.createElement("td", { colSpan: 14, style: { ...tdS, color: "#c8102e", fontSize: 10, fontStyle: "italic" } }, "⚠ CORS blocked — use Regime Change scanner (works with CORS) or open via local HTTP server")
     );
     const et = runET(r, vix);
     const ba = baRes[r.symbol];
