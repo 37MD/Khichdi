@@ -17703,6 +17703,21 @@ const PROXY_LIST = [
   "https://thingproxy.freeboard.io/fetch/"
 ];
 let _proxyIdx = 0;
+// Stooq symbol overrides for Yahoo symbols that don't auto-convert
+const STOOQ_OVERRIDES = {
+  'nifty_midcap_100.nse': 'niftymcap100.nse',
+  'nifty_mid_select.nse': 'nifty_midcap_select.nse',
+  'nifty_largemid250.nse': 'nifty_largemid250.nse',
+  'nifty_microcap250.nse': 'nifty_microcap250.nse',
+  'nifty_total_mkt.nse': 'nifty_total_mkt.nse',
+  'nifty_fin_service.nse': 'nifty_fin_service.nse',
+  'nifty_highbeta_50.nse': 'nifty_highbeta_50.nse',
+  'nifty_india_mfg.nse': 'nifty_india_mfg.nse',
+  'nifty_alpha_low_vol_30.nse': 'nifty_alpha_low_vol_30.nse',
+  'nifty100_quality_30.nse': 'nifty100_quality_30.nse',
+  'nifty100_low_vol_30.nse': 'nifty100_low_vol_30.nse',
+  'nifty200_quality_30.nse': 'nifty200_quality_30.nse',
+};
 async function _fetchWithFallback(url, opts) {
   for (let attempt = 0; attempt < PROXY_LIST.length; attempt++) {
     const px = PROXY_LIST[(_proxyIdx + attempt) % PROXY_LIST.length];
@@ -17850,15 +17865,17 @@ async function fetchIdx(symbol) {
           .replace(/\.NS$/i, '.nse')   // NSE stocks: .NS → .nse
           .replace(/\.BO$/i, '.bo')    // BSE stocks: .BO → .bo
           .toLowerCase();
+        // Apply override map for symbols that don't auto-convert to stooq
+        if (STOOQ_OVERRIDES[stooqSym]) stooqSym = STOOQ_OVERRIDES[stooqSym];
         // Lipper/Refinitiv codes (0P000...) won't work on stooq
-        if (stooqSym.match(/^0p/i)) throw new Error('Lipper code');
+        if (stooqSym.match(/^0p/)) throw new Error('Lipper code');
         const stooqUrl = `https://stooq.com/q/d/l/?s=${stooqSym}&i=d`;
         const stooqRes = await fetch(stooqUrl, { signal: AbortSignal.timeout(6000) });
         if (stooqRes.ok) {
           const csv = await stooqRes.text();
           const lines = csv.trim().split('\n').slice(1);
           const closes = lines.map(l => { const c = parseFloat(l.split(',')[4]); return isNaN(c) ? null : c; }).filter(c => c !== null);
-          if (closes.length > 20) {
+          if (closes.length > 10) {
             dC = closes;
             wC = closes.filter((_, i) => i % 5 === 4 || i === closes.length - 1);
             q = { regularMarketPrice: closes[closes.length - 1] };
