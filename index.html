@@ -18461,15 +18461,20 @@ function LDScanner() {
     value: "FAKE SUPPORT"
   }, "\uD83D\uDD34 Fake"), /*#__PURE__*/React.createElement("option", {
     value: "ABORT"
-  }, "\uD83D\uDC80 Abort")), !scanning ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
+  }, "\uD83D\uDC80 Abort")), !scanning ? /*#__PURE__*/React.createElement("span", {
+    style: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 4
+    }
+  }, /*#__PURE__*/React.createElement("span", {
     style: {
       fontSize: 9,
       color: "#888",
       fontFamily: "'Space Mono','Courier New',monospace",
-      whiteSpace: "nowrap",
-      marginRight: 4
+      whiteSpace: "nowrap"
     }
-  }, Object.values(results).filter(v => v && !v.error && v.wRsi != null).length + "/" + ALL_INDICES.filter(i => i.symbol).length + " OK"), /*#__PURE__*/React.createElement("button", {
+  }, Object.keys(results).filter(k => results[k] && !results[k].error && results[k].wRsi != null).length + "/" + ALL_INDICES.filter(i => i.symbol).length + " OK"), /*#__PURE__*/React.createElement("button", {
     style: {
       background: accent,
       border: "none",
