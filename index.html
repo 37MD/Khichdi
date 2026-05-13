@@ -17831,7 +17831,7 @@ async function fetchIdx(symbol) {
   const dUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=6mo`;
   const qtUrl = `https://query1.finance.yahoo.com/v8/finance/quote?symbols=${symbol}`;
   try {
-    const sig = { signal: AbortSignal.timeout(15000) };
+    const sig = { signal: AbortSignal.timeout(8000) };
     const [wkR, dR, qtR] = await Promise.all([
       _fetchWithFallback(wkUrl, sig),
       _fetchWithFallback(dUrl, sig),
@@ -18095,28 +18095,28 @@ function LDScanner() {
     const toFetch = ALL_INDICES.filter(i => i.symbol);
     let done = 0,
       tmp = {};
-    for (const idx of toFetch) {
+    const BATCH = 6;
+    for (let b = 0; b < toFetch.length; b += BATCH) {
       if (stopRef.current) break;
+      const batch = toFetch.slice(b, b + BATCH);
       setProgress({
         done,
         total: toFetch.length,
-        label: "Scanning " + idx.name + "..."
+        label: "Batch " + (b / BATCH + 1) + "/" + Math.ceil(toFetch.length / BATCH)
       });
-      const d = await fetchIdx(idx.symbol);
-      done++;
-      tmp = {
-        ...tmp,
-        [idx.symbol]: d
-      };
-      setResults({
-        ...tmp
+      const batchResults = await Promise.allSettled(batch.map(idx => fetchIdx(idx.symbol)));
+      batch.forEach((idx, i) => {
+        if (stopRef.current) return;
+        const r = batchResults[i];
+        tmp = { ...tmp, [idx.symbol]: r.status === 'fulfilled' ? r.value : { error: true } };
+        done++;
       });
+      setResults({ ...tmp });
       setProgress({
         done,
         total: toFetch.length,
-        label: idx.name
+        label: done + "/" + toFetch.length + " scanned"
       });
-      await sleep(500);
     }
     // Save to localStorage
     const savedDate = saveCache(tmp);
