@@ -18631,6 +18631,53 @@ function LDScanner() {
     }
   })), /*#__PURE__*/React.createElement("div", {
     style: {
+      display: "grid",
+      gridTemplateColumns: "repeat(4,1fr)",
+      gap: 4,
+      padding: "4px 6px 0"
+    }
+  }, [{
+    lbl: "Total Index to be scanned",
+    val: ALL_INDICES.filter(function(i){return i.symbol;}).length + "",
+    col: bdr2
+  }, {
+    lbl: "Total Index Scanned",
+    val: hasData ? Object.keys(results).filter(function(s){return results[s]&&!results[s].error;}).length + "" : "0",
+    col: accent
+  }, {
+    lbl: "Total Index Displayed",
+    val: rows.length + "",
+    col: accent
+  }, {
+    lbl: "Index Not Scanned",
+    val: hasData ? (ALL_INDICES.filter(function(i){return i.symbol;}).length - Object.keys(results).filter(function(s){return results[s]&&!results[s].error;}).length) + "" : String(ALL_INDICES.filter(function(i){return i.symbol;}).length),
+    col: red
+  }].map(function(s){return /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: surf2,
+      border: "1px solid " + s.col,
+      borderRadius: 4,
+      padding: "5px 8px",
+      textAlign: "center",
+      display: "flex",
+      flexDirection: "column",
+      gap: 2,
+      fontFamily: "'Space Mono','Courier New',monospace"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 9,
+      color: "#000",
+      letterSpacing: "0.5px"
+    }
+  }, s.lbl), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 18,
+      fontWeight: 700,
+      color: s.col
+    }
+  }, s.val))})), /*#__PURE__*/React.createElement("div", {
+    style: {
       padding: "4px 6px"
     }
   }, hasData ? /*#__PURE__*/React.createElement("div", {
