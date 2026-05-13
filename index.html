@@ -18442,7 +18442,19 @@ function LDScanner() {
       ...F,
       whiteSpace: "nowrap"
     }
-  }, "\uD83D\uDCBE", " ", cacheDate), /*#__PURE__*/React.createElement("div", {
+  }, "\uD83D\uDCBE", " ", cacheDate), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 10,
+      fontWeight: 700,
+      color: "#000",
+      ...F,
+      whiteSpace: "nowrap",
+      border: `1px solid ${bdr}`,
+      padding: "1px 6px",
+      borderRadius: 3,
+      background: "#fff"
+    }
+  }, "Index Scanned: ", Object.values(results).filter(function(x){return x&&!x.error}).length, "/", ALL_INDICES.filter(function(x){return x.symbol}).length), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       alignItems: "center",
