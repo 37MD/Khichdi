@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Indian Daily Dash (Text-Only Portrait)</title>
 <style>
   /* Base styling ensuring strictly black fonts only */
   body {
     font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #7a7a7a; 
+    background-color: #d6c9b3;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.015) 1px, rgba(0,0,0,0.015) 2px);
     margin: 0;
     padding: 0;
     color: #000000;
@@ -22,50 +24,10 @@
     overflow-wrap: break-word;
   }
 
-  /* FORCED PORTRAIT: Landscape Blocker Overlay */
-  #landscape-blocker {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: #cccccc;
-    z-index: 9999;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
-    border: 5px solid #000000;
-    box-sizing: border-box;
-  }
-
-  #landscape-blocker h2 {
-    font-size: 2em;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-
-  #landscape-blocker p {
-    font-size: 1.2em;
-    font-weight: bold;
-  }
-
-  @media screen and (orientation: landscape) {
-    #landscape-blocker {
-      display: flex; 
-    }
-    .mobile-container {
-      display: none !important; 
-    }
-  }
-
-  /* Android Mobile Screen Wrapper */
   .mobile-container {
     width: 100%;
-    max-width: 480px; 
-    background-color: #e9ecef;
+    max-width: 960px; 
+    background-color: #faf3e0;
     min-height: 100vh;
     box-shadow: 0 4px 15px rgba(0,0,0,0.6);
     padding: 15px;
@@ -74,42 +36,48 @@
   }
 
   .header {
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 25px;
     padding: 15px 10px;
     border: 2px solid #000000;
-    background-color: #d1d1d1;
+    background-color: #4a6fa5;
   }
 
-  .reset-btn {
-    width: 100%;
-    margin-bottom: 15px;
-    background-color: #a3a3a3;
+  #lang-select {
+    background-color: #e9c46a;
     border: 2px solid #000000;
-    padding: 12px 10px; 
+    padding: 6px 8px;
+    font-weight: bold;
+    font-size: 0.9em;
+    cursor: pointer;
+  }
+
+  .reset-small-btn {
+    background-color: #d4a373;
+    border: 2px solid #000000;
+    padding: 8px 12px;
     font-weight: bold;
     cursor: pointer;
-    font-size: 1em;
+    font-size: 0.8em;
+    white-space: nowrap;
+    margin-left: auto;
+    align-self: center;
   }
 
-  .reset-btn:hover {
-    background-color: #8c8c8c;
+  .reset-small-btn:hover {
+    background-color: #c4956a;
   }
 
   .header h1 {
-    margin: 0 0 8px 0;
+    margin: 0;
     font-size: 1.8em; 
     line-height: 1.2;
   }
 
-  .header p {
-    margin: 0;
-    font-size: 1.1em;
-    font-weight: bold;
-  }
-
   .category-title {
-    background-color: #c0c0c0;
+    background-color: #e07a5f;
     padding: 12px;
     border: 3px solid #000000;
     margin-top: 35px;
@@ -120,8 +88,46 @@
     text-transform: uppercase;
   }
 
+  #section-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 25px;
+  }
+
+  .section-btn {
+    flex: 1;
+    min-width: 100px;
+    padding: 14px 10px;
+    border: 3px solid #000000;
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .section-btn:hover {
+    filter: brightness(0.9);
+  }
+
+  .section-btn.active {
+    filter: brightness(0.8);
+    border-width: 4px;
+  }
+
+  .section-content {
+    display: none;
+  }
+
+  .section-content.open {
+    display: block;
+  }
+
   #saved-section {
-    background-color: #dcdcdc;
+    background-color: #e9c46a;
     border: 3px dashed #000000;
     padding: 15px;
     margin-bottom: 30px;
@@ -129,7 +135,7 @@
   
   #saved-section .category-title {
     margin-top: 0;
-    background-color: #a3a3a3;
+    background-color: #d4a373;
   }
 
   .feed-section {
@@ -150,7 +156,7 @@
 
   .language-tag {
     font-size: 0.75em;
-    background-color: #a3a3a3;
+    background-color: #a8dadc;
     padding: 4px 8px;
     border: 1px solid #000000;
     font-weight: bold;
@@ -165,15 +171,23 @@
   }
 
   .card {
-    background-color: #cccccc;
+    background-color: #f4f1de;
     border: 2px solid #000000;
-    padding: 18px 15px;
+    padding: 12px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .card-body {
+    flex: 4;
     display: flex;
     flex-direction: column;
+    min-width: 0;
   }
 
   .insight-card {
-    background-color: #b3b3b3;
+    background-color: #e0e1dd;
     border: 3px solid #000000;
     padding: 18px 15px;
     display: flex;
@@ -194,42 +208,46 @@
     margin-bottom: 0;
   }
 
-  .card h3 {
-    margin: 0 0 12px 0;
+  .card-body h3 {
+    margin: 0 0 8px 0;
     font-size: 1.4em;
     line-height: 1.3;
     border-bottom: 1px solid #000000;
-    padding-bottom: 8px;
+    padding-bottom: 6px;
   }
 
-  .card p {
-    font-size: 1.05em;
-    line-height: 1.6;
+  .card-body p {
+    font-size: 1.15em;
+    line-height: 1.7;
     flex-grow: 1;
-    margin-bottom: 15px;
-    margin-top: 0;
+    margin: 0;
   }
 
   .card-actions {
+    flex: 1;
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 10px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    min-width: 80px;
   }
 
-  .btn {
-    flex: 1;
+  .btn-sm {
+    width: 100%;
     text-align: center;
     font-weight: bold;
     border: 2px solid #000000;
-    padding: 12px 5px; 
-    background-color: #a3a3a3;
-    font-size: 0.9em;
+    padding: 8px 3px;
+    background-color: #d4a373;
+    font-size: 0.7em;
     cursor: pointer;
+    text-decoration: none;
+    color: #000000 !important;
+    box-sizing: border-box;
   }
 
-  .btn:hover {
-    background-color: #8c8c8c;
+  .btn-sm:hover {
+    background-color: #c4956a;
   }
 
   .read-original {
@@ -240,13 +258,13 @@
     font-weight: bold;
     border: 2px solid #000000;
     padding: 12px 15px; 
-    background-color: #999999;
+    background-color: #a8dadc;
     font-size: 1em;
     transition: background-color 0.2s;
   }
 
   .read-original:hover {
-    background-color: #7a7a7a;
+    background-color: #8ecae6;
   }
 
   .loading {
@@ -264,7 +282,7 @@
     width: 100%;
     box-sizing: border-box;
     margin-bottom: 15px;
-    background-color: #e9ecef;
+    background-color: #f4f1de;
     font-size: 1.1em;
   }
   
@@ -273,67 +291,43 @@
     flex-direction: column;
     gap: 10px;
   }
+
+  .goog-te-banner-frame, .goog-te-menu-frame, .goog-te-gadget-icon {
+    display: none !important;
+  }
+
+  body > .skiptranslate {
+    display: none !important;
+  }
+
+  .goog-te-gadget {
+    height: 0 !important;
+    overflow: hidden !important;
+    font-size: 0 !important;
+  }
 </style>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </head>
 <body>
 
-<!-- LANDSCAPE BLOCKER -->
-<div id="landscape-blocker">
-  <h2>Rotate Device</h2>
-  <p>This text-only dashboard is forced into portrait format for optimal reading. Please rotate your phone upright.</p>
-</div>
-
 <div class="mobile-container">
   
-  <button class="reset-btn" onclick="resetHistory()">&#8634; Reset Hidden Feeds</button>
-  
   <div class="header">
-    <h1>Text-Only Dash</h1>
-    <p>Travel, Shopping, Wellness & News</p>
+    <h1>Khichdi v1A</h1>
+    <div id="google_translate_element"></div>
+    <select id="lang-select">
+      <option value="marathi">Marathi</option>
+      <option value="hindi">Hindi</option>
+      <option value="english">English</option>
+    </select>
   </div>
+
+  <div id="section-buttons"></div>
 
   <!-- SAVED ARTICLES SECTION -->
   <div id="saved-section" style="display: none;">
     <div class="category-title">&#128206; Saved</div>
     <div class="grid" id="saved-grid"></div>
-  </div>
-
-  <!-- INTERACTIVE WIDGETS SECTION (TRAVEL & SHOPPING) -->
-  <div class="category-title">Interactive Tools</div>
-  <div class="feed-section">
-
-    <!-- Destination Explorer Tool -->
-    <div class="card">
-      <h3>Destination Explorer</h3>
-      <p>Enter any tourist site in India to view photo galleries or watch video tours without cluttering your feed.</p>
-      <input type="text" id="travel-search-input" class="search-input" placeholder="e.g. Manali, Kerala, Hampi">
-      <div class="search-buttons">
-        <button class="btn" onclick="searchTravel('photos')">View Photos</button>
-        <button class="btn" onclick="searchTravel('youtube')">Watch YouTube Tours</button>
-      </div>
-    </div>
-    
-    <!-- Price Drop History Checker -->
-    <div class="card" style="margin-top: 20px;">
-      <h3>Price Drop Graph Checker</h3>
-      <p>Paste a product link to see its 6-month price history graph. Instantly know if it is a real drop or a fake sale.</p>
-      <input type="text" id="price-tracker-input" class="search-input" placeholder="Paste Amazon/Flipkart/Myntra Link">
-      <div class="search-buttons">
-        <button class="btn" onclick="checkPriceHistory()">Show Historical Price Graph</button>
-      </div>
-    </div>
-
-    <!-- Quick Search Tool -->
-    <div class="card" style="margin-top: 20px;">
-      <h3>Quick Clean Shopping</h3>
-      <p>Enter a product name below for direct, ad-free links to search results.</p>
-      <input type="text" id="shop-search-input" class="search-input" placeholder="e.g. running shoes">
-      <div class="search-buttons">
-        <button class="btn" onclick="searchPortal('amazon')">Search Amazon</button>
-        <button class="btn" onclick="searchPortal('flipkart')">Search Flipkart</button>
-        <button class="btn" onclick="searchPortal('myntra')">Search Myntra</button>
-      </div>
-    </div>
   </div>
 
   <!-- MAIN FEED CONTAINER -->
@@ -469,12 +463,14 @@
       card.className = 'card';
       
       card.innerHTML = `
-        <h3>${article.title}</h3>
-        <p>${article.summary}</p>
-        <div class="card-actions">
-          <button class="btn btn-unsave" data-link="${article.link}">Remove from Saved</button>
+        <div class="card-body">
+          <h3>${article.title}</h3>
+          <p>${article.summary}</p>
         </div>
-        <a href="${article.link}" target="_blank" class="read-original" data-link="${article.link}">${article.buttonText}</a>
+        <div class="card-actions">
+          <a href="${getTranslatedLink(article.link, false)}" target="_blank" class="btn-sm read-original" data-link="${article.link}">${article.buttonText}</a>
+          <button class="btn-sm btn-unsave" data-link="${article.link}">Remove</button>
+        </div>
       `;
       savedGrid.appendChild(card);
     });
@@ -525,63 +521,83 @@
   }
 
   // Complete array of all sections including the new Travel News section
-  const feedCategories = [
+  const mainSections = [
     {
-      title: "Travel & Tourism (India)",
-      injectTip: false,
-      feeds: [
-        { name: "Top Destinations", language: "English", url: "https://news.google.com/rss/search?q=places+to+visit+in+India+tourism&hl=en-IN&gl=IN&ceid=IN:en" },
-        { name: "Incredible India News", language: "English", url: "https://news.google.com/rss/search?q=Indian+tourism+travel+news&hl=en-IN&gl=IN&ceid=IN:en" }
+      title: "Travel",
+      categories: [
+        {
+          title: "Travel & Tourism (India)",
+          injectTip: false,
+          feeds: [
+            { name: "Top Destinations", language: "English", url: "https://news.google.com/rss/search?q=places+to+visit+in+India+tourism&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "Incredible India News", language: "English", url: "https://news.google.com/rss/search?q=Indian+tourism+travel+news&hl=en-IN&gl=IN&ceid=IN:en" }
+          ]
+        }
       ]
     },
     {
-      title: "Shopping & Offers News",
-      injectTip: false,
-      feeds: [
-        { name: "Sale & Festival Offers", language: "English", url: "https://news.google.com/rss/search?q=Amazon+OR+Flipkart+OR+Myntra+sale+offers+India&hl=en-IN&gl=IN&ceid=IN:en" },
-        { name: "Price Drop Alerts", language: "English", url: "https://news.google.com/rss/search?q=price+drop+smartphones+gadgets+India&hl=en-IN&gl=IN&ceid=IN:en" }
+      title: "Shopping",
+      categories: [
+        {
+          title: "Shopping & Offers News",
+          injectTip: false,
+          feeds: [
+            { name: "Sale & Festival Offers", language: "English", url: "https://news.google.com/rss/search?q=Amazon+OR+Flipkart+OR+Myntra+sale+offers+India&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "Price Drop Alerts", language: "English", url: "https://news.google.com/rss/search?q=price+drop+smartphones+gadgets+India&hl=en-IN&gl=IN&ceid=IN:en" }
+          ]
+        }
       ]
     },
     {
-      title: "Top News (Shorts)",
-      injectTip: false,
-      feeds: [
-        { name: "NDTV (National)", language: "English", url: "https://feeds.feedburner.com/ndtvnews-top-stories" },
-        { name: "Zee News (National)", language: "Hindi", url: "https://zeenews.india.com/hindi/india.xml" },
-        { name: "News18 (Tech)", language: "English", url: "https://www.news18.com/rss/tech.xml" }
+      title: "News",
+      categories: [
+        {
+          title: "Top News (Shorts)",
+          injectTip: false,
+          feeds: [
+            { name: "NDTV (National)", language: "English", url: "https://feeds.feedburner.com/ndtvnews-top-stories" },
+            { name: "Zee News (National)", language: "Hindi", url: "https://zeenews.india.com/hindi/india.xml" },
+            { name: "News18 (Tech)", language: "English", url: "https://www.news18.com/rss/tech.xml" }
+          ]
+        },
+        {
+          title: "Marathi News (ताज्या बातम्या)",
+          injectTip: false,
+          feeds: [
+            { name: "News18 Marathi", language: "Marathi", url: "https://news18marathi.com/rss/" },
+            { name: "ABP Majha", language: "Marathi", url: "https://marathi.abplive.com/home/feed" }
+          ]
+        }
       ]
     },
     {
-      title: "Kitchen & Household",
-      injectTip: false,
-      feeds: [
-        { name: "Kabita's Kitchen (YT)", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCChxc2TjcTpeH5Lnjj55tKQ", isYoutube: true },
-        { name: "MadhurasRecipe (YT)", language: "Marathi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCQG_jzCQpsIVPG02_iXjB0g", isYoutube: true },
-        { name: "Swasthi's Recipes", language: "English", url: "https://www.indianhealthyrecipes.com/feed/" }
-      ]
-    },
-    {
-      title: "Marathi News (ताज्या बातम्या)",
-      injectTip: false,
-      feeds: [
-        { name: "News18 Marathi", language: "Marathi", url: "https://news18marathi.com/rss/" },
-        { name: "ABP Majha", language: "Marathi", url: "https://marathi.abplive.com/home/feed" }
-      ]
-    },
-    {
-      title: "Health & Yoga",
-      injectTip: true, 
-      feeds: [
-        { name: "Times of India - Health", language: "English", url: "https://timesofindia.indiatimes.com/rssfeeds/2886704.cms" },
-        { name: "Fit Tuber (YT)", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCYC6VEEqE-5r0O-A8N6zB3g", isYoutube: true }
-      ]
-    },
-    {
-      title: "Stories & Articles",
-      injectTip: false,
-      feeds: [
-        { name: "Hindi Sahitya Darpan", language: "Hindi", url: "https://www.hindisahityadarpan.in/feeds/posts/default?alt=rss" },
-        { name: "Maharashtra Times", language: "Marathi", url: "https://maharashtratimes.com/rssfeeds/4836692.cms" }
+      title: "Lifestyle & Wellness",
+      categories: [
+        {
+          title: "Kitchen & Household",
+          injectTip: false,
+          feeds: [
+            { name: "Kabita's Kitchen (YT)", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCChxc2TjcTpeH5Lnjj55tKQ", isYoutube: true },
+            { name: "MadhurasRecipe (YT)", language: "Marathi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCQG_jzCQpsIVPG02_iXjB0g", isYoutube: true },
+            { name: "Swasthi's Recipes", language: "English", url: "https://www.indianhealthyrecipes.com/feed/" }
+          ]
+        },
+        {
+          title: "Health & Yoga",
+          injectTip: true,
+          feeds: [
+            { name: "Times of India - Health", language: "English", url: "https://timesofindia.indiatimes.com/rssfeeds/2886704.cms" },
+            { name: "Fit Tuber (YT)", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCYC6VEEqE-5r0O-A8N6zB3g", isYoutube: true }
+          ]
+        },
+        {
+          title: "Stories & Articles",
+          injectTip: false,
+          feeds: [
+            { name: "Hindi Sahitya Darpan", language: "Hindi", url: "https://www.hindisahityadarpan.in/feeds/posts/default?alt=rss" },
+            { name: "Maharashtra Times", language: "Marathi", url: "https://maharashtratimes.com/rssfeeds/4836692.cms" }
+          ]
+        }
       ]
     }
   ];
@@ -589,120 +605,207 @@
   const container = document.getElementById('feed-container');
   const rss2jsonUrl = 'https://api.rss2json.com/v1/api.json?rss_url=';
 
-  feedCategories.forEach(category => {
-    
-    const catHeader = document.createElement('div');
-    catHeader.className = 'category-title';
-    catHeader.innerText = category.title;
-    container.appendChild(catHeader);
+  function renderSectionContent(sectionEl, section) {
+    section.categories.forEach(cat => {
+      const catHeader = document.createElement('div');
+      catHeader.className = 'category-title';
+      catHeader.innerText = cat.title;
+      sectionEl.appendChild(catHeader);
 
-    if (category.injectTip) {
-      const tipSection = document.createElement('div');
-      tipSection.className = 'feed-section';
-      const dailyMetabolicTip = getRandomTip(wellnessTips);
-      const dailyWomensTip = getRandomTip(womensWellnessTips);
-      
-      tipSection.innerHTML = `
-        <div class="grid">
-          <div class="insight-card">
-            <h3>&#10024; Daily Metabolic Insight</h3>
-            <p><strong>Did you know?</strong> ${dailyMetabolicTip}</p>
+      if (cat.injectTip) {
+        const tipSection = document.createElement('div');
+        tipSection.className = 'feed-section';
+        const dailyMetabolicTip = getRandomTip(wellnessTips);
+        const dailyWomensTip = getRandomTip(womensWellnessTips);
+        
+        tipSection.innerHTML = `
+          <div class="grid">
+            <div class="insight-card">
+              <h3>&#10024; Daily Metabolic Insight</h3>
+              <p><strong>Did you know?</strong> ${dailyMetabolicTip}</p>
+            </div>
+            <div class="insight-card">
+              <h3>&#127804; Women's Wellness Focus</h3>
+              <p><strong>Vital Tip:</strong> ${dailyWomensTip}</p>
+            </div>
           </div>
-          <div class="insight-card">
-            <h3>&#127804; Women's Wellness Focus</h3>
-            <p><strong>Vital Tip:</strong> ${dailyWomensTip}</p>
+        `;
+        sectionEl.appendChild(tipSection);
+      }
+
+      cat.feeds.forEach(feed => {
+        const feedSection = document.createElement('div');
+        feedSection.className = 'feed-section';
+        
+        const safeId = `grid-${feed.name.replace(/[^a-zA-Z0-9]/g, '')}`;
+        
+        feedSection.innerHTML = `
+          <h2>
+            ${feed.name} 
+            <span class="language-tag">${feed.language}</span>
+          </h2>
+          <div class="grid" id="${safeId}">
+            <p class="loading">Loading latest content...</p>
           </div>
-        </div>
-      `;
-      container.appendChild(tipSection);
+        `;
+        
+        sectionEl.appendChild(feedSection);
+        const grid = document.getElementById(safeId);
+
+        fetch(rss2jsonUrl + encodeURIComponent(feed.url))
+          .then(response => response.json())
+          .then(data => {
+            grid.innerHTML = ''; 
+
+            if (data.status !== 'ok') {
+              grid.innerHTML = '<p>Failed to load feed. The publisher may have restricted access.</p>';
+              return;
+            }
+
+            const unreadItems = data.items.filter(item => !readArticles.includes(item.link));
+            const itemsToDisplay = unreadItems.slice(0, 6);
+
+            if(itemsToDisplay.length === 0) {
+               grid.innerHTML = '<p>You are all caught up! No new articles right now.</p>';
+               return;
+            }
+
+            itemsToDisplay.forEach(item => {
+              const card = document.createElement('div');
+              card.className = 'card';
+              card.setAttribute('data-link', item.link);
+
+              let tempDiv = document.createElement("div");
+              tempDiv.innerHTML = item.description;
+              let cleanText = tempDiv.textContent || tempDiv.innerText || "";
+              
+              let wordsArray = cleanText.trim().split(/\s+/).filter(word => word.length > 0);
+              let summary = "";
+              
+              if (wordsArray.length > 100) {
+                summary = wordsArray.slice(0, 100).join(" ") + " ...";
+              } else {
+                summary = wordsArray.join(" ");
+              }
+              
+              if (summary.trim() === "" || summary === "...") {
+                 summary = "Tap below to view the full text or video directly from the source.";
+              }
+
+              let buttonText = feed.isYoutube ? "Open Original Video" : "Read Original Source";
+
+              const articleData = {
+                 title: item.title,
+                 link: item.link,
+                 summary: summary,
+                 buttonText: buttonText
+              };
+              
+              const safeArticleData = encodeURIComponent(JSON.stringify(articleData));
+
+              card.innerHTML = `
+                <div class="card-body">
+                  <h3>${item.title}</h3>
+                  <p>${summary}</p>
+                </div>
+                <div class="card-actions">
+                  <button class="btn-sm btn-dismiss" data-link="${item.link}">Hide</button>
+                  <button class="btn-sm btn-save" data-article="${safeArticleData}">Save</button>
+                  <a href="${getTranslatedLink(item.link, feed.isYoutube)}" target="_blank" class="btn-sm read-original" data-link="${item.link}">${buttonText}</a>
+                </div>
+              `;
+              grid.appendChild(card);
+            });
+          })
+          .catch(error => {
+            grid.innerHTML = '<p>Error fetching data. Check your network connection.</p>';
+          });
+      });
+    });
+  }
+
+  function getTranslatedLink(link, isYoutube) {
+    if (isYoutube) return link;
+    const lang = document.getElementById('lang-select').value;
+    const tl = lang === 'hindi' ? 'hi' : lang === 'marathi' ? 'mr' : 'en';
+    return 'https://translate.google.com/translate?sl=auto&tl=' + tl + '&u=' + encodeURIComponent(link);
+  }
+
+  const btnContainer = document.getElementById('section-buttons');
+  const sectionColors = ['#e07a5f', '#81b29a', '#3d5a80', '#9b5de5'];
+
+  mainSections.forEach((section, index) => {
+    const btn = document.createElement('button');
+    btn.className = 'section-btn';
+    btn.innerText = section.title;
+    btn.style.backgroundColor = sectionColors[index];
+    btnContainer.appendChild(btn);
+
+    const sectionContent = document.createElement('div');
+    sectionContent.className = 'section-content';
+    sectionContent.id = 'sec-content-' + index;
+    container.appendChild(sectionContent);
+
+    let loaded = false;
+
+    btn.addEventListener('click', function() {
+      const allBtns = btnContainer.querySelectorAll('.section-btn');
+      const allContents = container.querySelectorAll('.section-content');
+      const isOpening = !sectionContent.classList.contains('open');
+
+      allBtns.forEach(b => b.classList.remove('active'));
+      allContents.forEach(c => c.classList.remove('open'));
+
+      if (isOpening) {
+        btn.classList.add('active');
+        sectionContent.classList.add('open');
+      }
+
+      if (isOpening && !loaded) {
+        loaded = true;
+        renderSectionContent(sectionContent, section);
+      }
+    });
+  });
+
+  const resetBtn = document.createElement('button');
+  resetBtn.className = 'reset-small-btn';
+  resetBtn.innerHTML = '&#8634; Reset';
+  resetBtn.addEventListener('click', resetHistory);
+  btnContainer.appendChild(resetBtn);
+
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'en',
+      includedLanguages: 'en,hi,mr'
+    }, 'google_translate_element');
+
+    setTimeout(function() {
+      const combo = document.querySelector('.goog-te-combo');
+      if (combo) {
+        const match = document.cookie.match(/googtrans=\/en\/(\w+)/);
+        combo.value = match ? match[1] : 'mr';
+        combo.dispatchEvent(new Event('change'));
+      }
+    }, 1500);
+  }
+
+  document.getElementById('lang-select').addEventListener('change', function() {
+    const val = this.value;
+    const langMap = { english: 'en', hindi: 'hi', marathi: 'mr' };
+    const tl = langMap[val];
+
+    if (tl === 'en') {
+      document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    } else {
+      document.cookie = 'googtrans=/en/' + tl + '; path=/;';
     }
 
-    category.feeds.forEach(feed => {
-      const section = document.createElement('div');
-      section.className = 'feed-section';
-      
-      const safeId = `grid-${feed.name.replace(/[^a-zA-Z0-9]/g, '')}`;
-      
-      section.innerHTML = `
-        <h2>
-          ${feed.name} 
-          <span class="language-tag">${feed.language}</span>
-        </h2>
-        <div class="grid" id="${safeId}">
-          <p class="loading">Loading latest content...</p>
-        </div>
-      `;
-      
-      container.appendChild(section);
-      const grid = document.getElementById(safeId);
-
-      fetch(rss2jsonUrl + encodeURIComponent(feed.url))
-        .then(response => response.json())
-        .then(data => {
-          grid.innerHTML = ''; 
-
-          if (data.status !== 'ok') {
-            grid.innerHTML = '<p>Failed to load feed. The publisher may have restricted access.</p>';
-            return;
-          }
-
-          const unreadItems = data.items.filter(item => !readArticles.includes(item.link));
-          const itemsToDisplay = unreadItems.slice(0, 6);
-
-          if(itemsToDisplay.length === 0) {
-             grid.innerHTML = '<p>You are all caught up! No new articles right now.</p>';
-             return;
-          }
-
-          itemsToDisplay.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.setAttribute('data-link', item.link);
-
-            let tempDiv = document.createElement("div");
-            tempDiv.innerHTML = item.description;
-            let cleanText = tempDiv.textContent || tempDiv.innerText || "";
-            
-            let wordsArray = cleanText.trim().split(/\s+/).filter(word => word.length > 0);
-            let summary = "";
-            
-            if (wordsArray.length > 80) {
-              summary = wordsArray.slice(0, 80).join(" ") + " ...";
-            } else {
-              summary = wordsArray.join(" ");
-            }
-            
-            if (summary.trim() === "" || summary === "...") {
-               summary = "Tap below to view the full text or video directly from the source.";
-            }
-
-            let buttonText = feed.isYoutube ? "Open Original Video" : "Read Original Source";
-
-            const articleData = {
-               title: item.title,
-               link: item.link,
-               summary: summary,
-               buttonText: buttonText
-            };
-            
-            const safeArticleData = encodeURIComponent(JSON.stringify(articleData));
-
-            card.innerHTML = `
-              <h3>${item.title}</h3>
-              <p>${summary}</p>
-              <div class="card-actions">
-                <button class="btn btn-save" data-article="${safeArticleData}">Save for Later</button>
-                <button class="btn btn-dismiss" data-link="${item.link}">Hide</button>
-              </div>
-              <a href="${item.link}" target="_blank" class="read-original" data-link="${item.link}">${buttonText}</a>
-            `;
-            grid.appendChild(card);
-          });
-        })
-        .catch(error => {
-          grid.innerHTML = '<p>Error fetching data. Check your network connection.</p>';
-        });
-    });
+    const gtCombo = document.querySelector('.goog-te-combo');
+    if (gtCombo) {
+      gtCombo.value = tl;
+      gtCombo.dispatchEvent(new Event('change'));
+    }
   });
 </script>
 
