@@ -923,6 +923,9 @@
             grid.innerHTML = '';
 
             if (data.status !== 'ok') {
+              if (feed.isYoutube) {
+                return fetchYoutubeFeed(feed, grid, safeId);
+              }
               grid.innerHTML = '<p>Failed to load feed. The publisher may have restricted access.</p>';
               return;
             }
@@ -938,10 +941,87 @@
             renderFeedBatch(grid, safeId);
           })
           .catch(error => {
-            grid.innerHTML = '<p>Error fetching data. Check your network connection.</p>';
+            if (feed.isYoutube) {
+              fetchYoutubeFeed(feed, grid, safeId);
+            } else {
+              grid.innerHTML = '<p>Error fetching data. Check your network connection.</p>';
+            }
           });
       });
     });
+  }
+
+  function parseYoutubeXml(xmlText) {
+    var doc = new DOMParser().parseFromString(xmlText, 'text/xml');
+    var entries = doc.getElementsByTagName('entry');
+    var items = [];
+    for (var ei = 0; ei < entries.length; ei++) {
+      var entry = entries[ei];
+      var title = '';
+      var t = entry.getElementsByTagName('title');
+      if (t.length) title = t[0].textContent || '';
+      var link = '';
+      var l = entry.getElementsByTagName('link');
+      for (var li = 0; li < l.length; li++) {
+        if (l[li].getAttribute('rel') === 'alternate') {
+          link = l[li].getAttribute('href') || '';
+          break;
+        }
+      }
+      var pubDate = '';
+      var p = entry.getElementsByTagName('published');
+      if (p.length) pubDate = p[0].textContent || '';
+      var vid = entry.getElementsByTagName('videoId');
+      var videoId = vid.length ? (vid[0].textContent || '') : '';
+      var desc = '';
+      var d = entry.getElementsByTagName('description');
+      if (d.length) desc = d[0].textContent || '';
+      if (!desc) {
+        var thumb = entry.getElementsByTagName('thumbnail');
+        if (thumb.length) desc = 'YouTube video';
+      }
+      if (title && link) {
+        items.push({
+          title: title,
+          link: link,
+          pubDate: pubDate,
+          description: desc,
+          videoId: videoId
+        });
+      }
+    }
+    return items;
+  }
+
+  function fetchYoutubeFeed(feed, grid, safeId) {
+    var proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(feed.url);
+    var fallbackUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(feed.url);
+
+    function tryFetch(primary, secondary) {
+      fetch(primary)
+        .then(function(r) { return r.text(); })
+        .then(function(xml) {
+          var items = parseYoutubeXml(xml);
+          if (items.length === 0) throw new Error('No items');
+          var unread = items.filter(function(item) { return readArticles.indexOf(item.link) === -1; });
+          grid.innerHTML = '';
+          if (unread.length === 0) {
+            grid.innerHTML = '<p>You are all caught up! No new videos right now.</p>';
+            return;
+          }
+          feedPageState[safeId] = { items: unread, displayed: 0, feed: feed };
+          renderFeedBatch(grid, safeId);
+        })
+        .catch(function() {
+          if (secondary) {
+            tryFetch(secondary, null);
+          } else {
+            grid.innerHTML = '<p>Failed to load YouTube feed. Try again later.</p>';
+          }
+        });
+    }
+
+    tryFetch(proxyUrl, fallbackUrl);
   }
 
   function getTranslatedLink(link, isYoutube) {
