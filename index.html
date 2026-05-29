@@ -1218,12 +1218,11 @@
       document.getElementById('reader-font-dec').style.display = 'none';
       document.getElementById('reader-font-inc').style.display = 'none';
       var chId = url.slice(10);
-      var plId = 'UU' + chId.slice(2);
       var channelUrl = 'https://www.youtube.com/channel/' + chId;
       extLink.onclick = function() { window.open(channelUrl, '_blank'); };
       document.getElementById('reader-content').innerHTML =
         '<div class="reader-video-wrap">' +
-          '<iframe class="reader-video-embed" src="https://www.youtube.com/embed/videoseries?list=' + plId + '&rel=0&modestbranding=1&iv_load_policy=3" allowfullscreen></iframe>' +
+          '<iframe class="reader-video-embed" src="https://www.youtube.com/embed?listType=user_uploads&list=' + chId + '&rel=0&modestbranding=1&iv_load_policy=3&autoplay=1" allowfullscreen></iframe>' +
         '</div>' +
         '<h1 class="reader-article-title" style="padding:15px 20px 0">' + escapeHtml(title) + '</h1>';
       var scrollEl = document.getElementById('reader-scroll');
