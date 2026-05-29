@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Indian Daily Dash (Text-Only Portrait)</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   /* Base styling ensuring strictly black fonts only */
   body {
@@ -170,22 +171,6 @@
     margin-top: 15px;
   }
 
-  .card {
-    background-color: #f4f1de;
-    border: 2px solid #000000;
-    padding: 12px;
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-  }
-
-  .card-body {
-    flex: 4;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-  }
-
   .insight-card {
     background-color: #e0e1dd;
     border: 3px solid #000000;
@@ -208,63 +193,49 @@
     margin-bottom: 0;
   }
 
-  .card-body h3 {
-    margin: 0 0 8px 0;
-    font-size: 1.4em;
-    line-height: 1.3;
+  .feed-item {
+    margin-bottom: 28px;
     border-bottom: 1px solid #000000;
-    padding-bottom: 6px;
+    padding-bottom: 20px;
   }
 
-  .card-body p {
-    font-size: 1.15em;
-    line-height: 1.7;
-    flex-grow: 1;
-    margin: 0;
-  }
-
-  .card-actions {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 6px;
-    min-width: 80px;
-  }
-
-  .btn-sm {
-    width: 100%;
-    text-align: center;
-    font-weight: bold;
-    border: 2px solid #000000;
-    padding: 8px 3px;
-    background-color: #d4a373;
-    font-size: 0.7em;
-    cursor: pointer;
-    text-decoration: none;
-    color: #000000 !important;
-    box-sizing: border-box;
-  }
-
-  .btn-sm:hover {
-    background-color: #c4956a;
-  }
-
-  .read-original {
+  .headline {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
     display: block;
-    text-align: center;
-    margin-top: 10px;
+    line-height: 1.3;
+    margin-bottom: 8px;
     text-decoration: none;
-    font-weight: bold;
-    border: 2px solid #000000;
-    padding: 12px 15px; 
-    background-color: #a8dadc;
-    font-size: 1em;
-    transition: background-color 0.2s;
+  }
+  .headline:hover {
+    text-decoration: underline;
   }
 
-  .read-original:hover {
-    background-color: #8ecae6;
+  .description {
+    font-size: 21px;
+    line-height: 1.6;
+    text-align: justify;
+    margin-bottom: 10px;
+  }
+
+  .meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .view-orig-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    text-decoration: underline;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
   }
 
   .loading {
@@ -305,6 +276,194 @@
     overflow: hidden !important;
     font-size: 0 !important;
   }
+
+  /* ===== ARTICLE READER PANEL ===== */
+  #reader-backdrop {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  #reader-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  #reader-panel {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: 100%;
+    max-width: 780px;
+    background: #faf3e0;
+    z-index: 1000;
+    box-shadow: -4px 0 20px rgba(0,0,0,0.4);
+    transform: translateX(100%);
+    transition: transform 0.35s ease;
+    display: flex;
+    flex-direction: column;
+    border-left: 3px solid #000;
+  }
+  #reader-panel.open {
+    transform: translateX(0);
+  }
+  .reader-topbar {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 2px solid #000;
+    flex-shrink: 0;
+    background: #4a6fa5;
+    gap: 12px;
+  }
+  .reader-back-btn {
+    background: none;
+    border: 2px solid #000;
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 4px 10px;
+    font-weight: bold;
+  }
+  .reader-source-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .reader-font-controls {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .reader-font-btn {
+    background: none;
+    border: 2px solid #000;
+    cursor: pointer;
+    padding: 2px 8px;
+    font-weight: bold;
+    font-size: 0.9em;
+  }
+  .reader-ext-link {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    text-decoration: underline;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+    white-space: nowrap;
+  }
+  .reader-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 25px 40px;
+  }
+  .reader-progress {
+    height: 3px;
+    background: #000;
+    width: 0%;
+    transition: width 0.1s;
+    flex-shrink: 0;
+  }
+  .reader-article-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6em;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 10px;
+  }
+  .reader-article-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #000;
+  }
+  .reader-body {
+    font-size: var(--reader-font-sz, 17px);
+    line-height: 1.8;
+  }
+  .reader-body p {
+    margin-bottom: 1.2em;
+  }
+  .reader-body a {
+    text-decoration: underline;
+  }
+  .reader-body img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 15px auto;
+    border: 2px solid #000;
+  }
+  .reader-body blockquote {
+    border-left: 3px solid #000;
+    padding-left: 15px;
+    margin-left: 0;
+  }
+  .reader-body ul, .reader-body ol {
+    padding-left: 25px;
+  }
+  .reader-body li {
+    margin-bottom: 0.4em;
+  }
+  .reader-body figcaption {
+    font-size: 0.85em;
+    text-align: center;
+    font-style: italic;
+  }
+  .reader-status {
+    text-align: center;
+    padding: 40px 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+  }
+  .reader-video-wrap {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    margin-bottom: 0;
+    background: #000;
+  }
+  .reader-video-embed {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .load-more-wrap {
+    text-align: center;
+    margin: 18px 0 20px;
+  }
+  .load-more-btn {
+    background: none;
+    border: 2px solid #000;
+    padding: 9px 24px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .load-more-btn:hover {
+    background: #e0e1dd;
+  }
+  .load-more-indicator {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-align: center;
+    padding: 8px 0;
+    cursor: pointer;
+  }
+  .load-more-indicator:hover {
+    text-decoration: underline;
+  }
 </style>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </head>
@@ -333,6 +492,26 @@
   <!-- MAIN FEED CONTAINER -->
   <div id="feed-container"></div>
 
+</div>
+
+<!-- READER PANEL -->
+<div id="reader-backdrop"></div>
+<div id="reader-panel">
+  <div class="reader-topbar">
+    <button class="reader-back-btn" id="reader-close-btn">&larr;</button>
+    <span class="reader-source-label" id="reader-source">Source</span>
+    <div class="reader-font-controls">
+      <button class="reader-font-btn" id="reader-font-dec">A&minus;</button>
+      <button class="reader-font-btn" id="reader-font-inc">A+</button>
+    </div>
+    <button class="reader-ext-link" id="reader-ext-link">&#8599; Original site</button>
+  </div>
+  <div class="reader-progress" id="reader-progress"></div>
+  <div class="reader-scroll" id="reader-scroll">
+    <div id="reader-content">
+      <div class="reader-status">Select an article to read</div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -408,6 +587,8 @@
   // ==========================================
   let readArticles = JSON.parse(localStorage.getItem('readArticles')) || [];
   let savedArticles = JSON.parse(localStorage.getItem('savedArticles')) || [];
+  const BATCH_SIZE = 25;
+  const feedPageState = {};
 
   function markAsRead(link) {
     if (!readArticles.includes(link)) {
@@ -459,33 +640,26 @@
     savedSection.style.display = 'block';
 
     savedArticles.forEach(article => {
-      const card = document.createElement('div');
-      card.className = 'card';
+      const feedItem = document.createElement('div');
+      feedItem.className = 'feed-item';
       
-      card.innerHTML = `
-        <div class="card-body">
-          <h3>${article.title}</h3>
-          <p>${article.summary}</p>
-        </div>
-        <div class="card-actions">
-          <a href="${getTranslatedLink(article.link, false)}" target="_blank" class="btn-sm read-original" data-link="${article.link}">${article.buttonText}</a>
-          <button class="btn-sm btn-unsave" data-link="${article.link}">Remove</button>
+      const safeTitle = article.title.replace(/"/g, '&quot;');
+      feedItem.innerHTML = `
+        <span class="headline reader-trigger" data-url="${article.link}" data-title="${safeTitle}" data-feed="Saved" data-date="">${article.title}</span>
+        <p class="description">${article.summary}</p>
+        <div class="meta">
+          <span></span>
+          <span>
+            <button class="view-orig-btn" onclick="window.open('${getTranslatedLink(article.link, false)}','_blank')">↗ Original site</button>
+            <button class="view-orig-btn btn-unsave" data-link="${article.link}" style="margin-left:12px;">Remove</button>
+          </span>
         </div>
       `;
-      savedGrid.appendChild(card);
+      savedGrid.appendChild(feedItem);
     });
   }
 
   document.addEventListener('click', (e) => {
-    if (e.target.matches('.read-original')) {
-       markAsRead(e.target.getAttribute('data-link'));
-    }
-    if (e.target.matches('.btn-dismiss')) {
-       markAsRead(e.target.getAttribute('data-link'));
-    }
-    if (e.target.matches('.btn-save')) {
-       saveArticle(e.target.getAttribute('data-article'));
-    }
     if (e.target.matches('.btn-unsave')) {
        unsaveArticle(e.target.getAttribute('data-link'));
     }
@@ -552,42 +726,111 @@
       title: "News",
       categories: [
         {
-          title: "Top News (Shorts)",
+          title: "News18 Marathi (न्यूज१८ लोकमत)",
           injectTip: false,
           feeds: [
-            { name: "NDTV (National)", language: "English", url: "https://feeds.feedburner.com/ndtvnews-top-stories" },
-            { name: "Zee News (National)", language: "Hindi", url: "https://zeenews.india.com/hindi/india.xml" },
-            { name: "News18 (Tech)", language: "English", url: "https://www.news18.com/rss/tech.xml" }
+            { name: "News18 Marathi - Main", language: "Marathi", url: "https://news18marathi.com/rss/" }
           ]
         },
         {
-          title: "Marathi News (ताज्या बातम्या)",
+          title: "ABP Majha (एबीपी माझा)",
           injectTip: false,
           feeds: [
-            { name: "News18 Marathi", language: "Marathi", url: "https://news18marathi.com/rss/" },
-            { name: "ABP Majha", language: "Marathi", url: "https://marathi.abplive.com/home/feed" }
+            { name: "ABP Majha - Latest", language: "Marathi", url: "https://marathi.abplive.com/latest-news/feed" },
+            { name: "ABP Majha - Maharashtra", language: "Marathi", url: "https://marathi.abplive.com/news/maharashtra/feed" },
+            { name: "ABP Majha - Politics", language: "Marathi", url: "https://marathi.abplive.com/news/politics/feed" },
+            { name: "ABP Majha - Mumbai", language: "Marathi", url: "https://marathi.abplive.com/news/mumbai/feed" },
+            { name: "ABP Majha - Sports", language: "Marathi", url: "https://marathi.abplive.com/sports/feed" },
+            { name: "ABP Majha - Entertainment", language: "Marathi", url: "https://marathi.abplive.com/entertainment/feed" },
+            { name: "ABP Majha - Business", language: "Marathi", url: "https://marathi.abplive.com/business/feed" },
+            { name: "ABP Majha - Crime", language: "Marathi", url: "https://marathi.abplive.com/crime/feed" },
+            { name: "ABP Majha - World", language: "Marathi", url: "https://marathi.abplive.com/news/world/feed" },
+            { name: "ABP Majha - Lifestyle", language: "Marathi", url: "https://marathi.abplive.com/lifestyle/feed" },
+            { name: "ABP Majha - Tech", language: "Marathi", url: "https://marathi.abplive.com/news/technology/feed" },
+            { name: "ABP Majha - Agriculture", language: "Marathi", url: "https://marathi.abplive.com/agriculture/feed" },
+            { name: "ABP Majha - Health", language: "Marathi", url: "https://marathi.abplive.com/health/feed" }
+          ]
+        },
+        {
+          title: "Loksatta (लोकसत्ता)",
+          injectTip: false,
+          feeds: [
+            { name: "Loksatta - Maharashtra", language: "Marathi", url: "https://www.loksatta.com/maharashtra/feed/" },
+            { name: "Loksatta - Desh Videsh", language: "Marathi", url: "https://www.loksatta.com/desh-videsh/feed/" },
+            { name: "Loksatta - Krida", language: "Marathi", url: "https://www.loksatta.com/krida/feed/" },
+            { name: "Loksatta - Manoranjan", language: "Marathi", url: "https://www.loksatta.com/manoranjan/feed/" },
+            { name: "Loksatta - Mumbai", language: "Marathi", url: "https://www.loksatta.com/cities/mumbai/feed/" },
+            { name: "Loksatta - Pune", language: "Marathi", url: "https://www.loksatta.com/cities/pune/feed/" },
+            { name: "Loksatta - Explained", language: "Marathi", url: "https://www.loksatta.com/explained/feed/" },
+            { name: "Loksatta - Lifestyle", language: "Marathi", url: "https://www.loksatta.com/lifestyle/feed/" },
+            { name: "Loksatta - Sampadkiya", language: "Marathi", url: "https://www.loksatta.com/sampadkiya/feed/" },
+            { name: "Loksatta - Tech", language: "Marathi", url: "https://www.loksatta.com/tech/feed/" },
+            { name: "Loksatta - Trending", language: "Marathi", url: "https://www.loksatta.com/trending/feed/" },
+            { name: "Loksatta - Auto", language: "Marathi", url: "https://www.loksatta.com/auto/feed/" },
+            { name: "Loksatta - Astrology", language: "Marathi", url: "https://www.loksatta.com/astrology/feed/" },
+            { name: "Loksatta - IPL", language: "Marathi", url: "https://www.loksatta.com/krida/ipl/feed/" }
+          ]
+        },
+        {
+          title: "Divya Marathi (दिव्य मराठी)",
+          injectTip: false,
+          feeds: [
+            { name: "Divya Marathi - Maharashtra", language: "Marathi", url: "https://divyamarathi.bhaskar.com/rss-v1--category-5492.xml" },
+            { name: "Divya Marathi - National", language: "Marathi", url: "https://divyamarathi.bhaskar.com/rss-v1--category-5489.xml" },
+            { name: "Divya Marathi - International", language: "Marathi", url: "https://divyamarathi.bhaskar.com/rss-v1--category-5490.xml" },
+            { name: "Divya Marathi - Sports", language: "Marathi", url: "https://divyamarathi.bhaskar.com/rss-v1--category-5491.xml" },
+            { name: "Divya Marathi - Entertainment", language: "Marathi", url: "https://divyamarathi.bhaskar.com/rss-v1--category-12018.xml" },
+            { name: "Divya Marathi - Business", language: "Marathi", url: "https://divyamarathi.bhaskar.com/rss-v1--category-5558.xml" },
+            { name: "Divya Marathi - Lifestyle", language: "Marathi", url: "https://divyamarathi.bhaskar.com/rss-v1--category-12021.xml" },
+            { name: "Divya Marathi - Tech-Auto", language: "Marathi", url: "https://divyamarathi.bhaskar.com/rss-v1--category-12023.xml" },
+            { name: "Divya Marathi - Opinion", language: "Marathi", url: "https://divyamarathi.bhaskar.com/rss-v1--category-12019.xml" }
+          ]
+        },
+        {
+          title: "Maharashtra Times (महाराष्ट्र टाइम्स)",
+          injectTip: false,
+          feeds: [
+            { name: "Maharashtra Times - Main", language: "Marathi", url: "https://maharashtratimes.com/rssfeedsdefault.cms" }
           ]
         }
       ]
     },
     {
-      title: "Lifestyle & Wellness",
+      title: "Kitchen",
       categories: [
         {
-          title: "Kitchen & Household",
+          title: "Cooking & Recipes",
           injectTip: false,
           feeds: [
-            { name: "Kabita's Kitchen (YT)", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCChxc2TjcTpeH5Lnjj55tKQ", isYoutube: true },
-            { name: "MadhurasRecipe (YT)", language: "Marathi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCQG_jzCQpsIVPG02_iXjB0g", isYoutube: true },
-            { name: "Swasthi's Recipes", language: "English", url: "https://www.indianhealthyrecipes.com/feed/" }
+            { name: "Swasthi's Recipes", language: "English", url: "https://www.indianhealthyrecipes.com/feed/" },
+            { name: "Dassana's Veg Recipes", language: "English", url: "https://www.vegrecipesofindia.com/feed/" },
+            { name: "My Food Story", language: "English", url: "https://myfoodstory.com/feed/" },
+            { name: "Cook with Manali", language: "English", url: "https://cookwithmanali.com/feed/" },
+            { name: "Ministry of Curry", language: "English", url: "https://ministryofcurry.com/feed/" },
+            { name: "Vegan Richa", language: "English", url: "https://www.veganricha.com/feed/" },
+            { name: "Spice Up The Curry", language: "English", url: "https://www.spiceupthecurry.com/feed/" },
+            { name: "The Curry Guy", language: "English", url: "https://greatcurryrecipes.net/feed/" },
+            { name: "Chitra's Food Book", language: "English", url: "https://www.chitrasfoodbook.com/feed/" },
+            { name: "Sharmi's Passions", language: "English", url: "https://www.sharmispassions.com/feed/" },
+            { name: "Archana's Kitchen", language: "English", url: "https://www.archanaskitchen.com/feed/" },
+            { name: "Manjula's Kitchen", language: "English", url: "https://www.manjulaskitchen.com/feed/" },
+            { name: "Padhu's Kitchen", language: "English", url: "https://www.padhuskitchen.com/feed/" },
+            { name: "Jeyashri's Kitchen", language: "English", url: "https://www.jeyashriskitchen.com/feed/" },
+            { name: "Yummy Tummy", language: "English", url: "https://www.yummytummyaarthi.com/feed/" },
+            { name: "Nisha Madhulika", language: "Hindi", url: "https://nishamadhulika.com/feed/" },
+            { name: "Rak's Kitchen", language: "English", url: "https://feeds.feedburner.com/RaksKitchen" }
           ]
-        },
+        }
+      ]
+    },
+    {
+      title: "Lifestyle",
+      categories: [
         {
           title: "Health & Yoga",
           injectTip: true,
           feeds: [
-            { name: "Times of India - Health", language: "English", url: "https://timesofindia.indiatimes.com/rssfeeds/2886704.cms" },
-            { name: "Fit Tuber (YT)", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCYC6VEEqE-5r0O-A8N6zB3g", isYoutube: true }
+            { name: "Times of India - Health", language: "English", url: "https://timesofindia.indiatimes.com/rssfeeds/2886704.cms" }
           ]
         },
         {
@@ -599,6 +842,33 @@
           ]
         }
       ]
+    },
+    {
+      title: "YouTube Videos",
+      categories: [
+        {
+          title: "Cooking Channels",
+          injectTip: false,
+          feeds: [
+            { name: "Sanjeev Kapoor Khazana", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCjJw4F7eHqRtNKzF50k0vRQ", isYoutube: true },
+            { name: "Rajshri Food", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCkEyB7I5MmtM_hC_X2Fzvvw", isYoutube: true },
+            { name: "Hebbar's Kitchen", language: "English", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCk8o4QxL0M6MIqDPVPqXN_w", isYoutube: true },
+            { name: "VahChef", language: "English", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCgQ9U-M8pIqIAh6fPJj8dWw", isYoutube: true },
+            { name: "Kabita's Kitchen", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCChxc2TjcTpeH5Lnjj55tKQ", isYoutube: true },
+            { name: "MadhurasRecipe", language: "Marathi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCQG_jzCQpsIVPG02_iXjB0g", isYoutube: true },
+            { name: "MadhurasRecipe Marathi", language: "Marathi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCmbua9iiakRr6nuCXxxsKSQ", isYoutube: true },
+            { name: "Sarita's Kitchen", language: "Marathi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UC5x4u6kU52hgTtLlBaHTSKg", isYoutube: true },
+            { name: "Gharcha Swaad", language: "Marathi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCkbpO3eJlGVnrqGGUkL8cGw", isYoutube: true },
+            { name: "Marathi Kitchen", language: "Marathi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCotmlEU8SV2vGk1XxrCPB3w", isYoutube: true },
+            { name: "Ras Kitchen", language: "Marathi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCVs7k1IfvKpnhKZ71NsEIUg", isYoutube: true },
+            { name: "Crazy Foody Ranjita", language: "Marathi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCwjTibvh8ZgbNcAubQ17J5w", isYoutube: true },
+            { name: "Marathi Baana", language: "Marathi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCltEPZ0rCUmZBTJEm5VSIOg", isYoutube: true },
+            { name: "Nathdeep's Kitchen", language: "Marathi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCOM7vmYDpWuJTlpxvXEpQLQ", isYoutube: true },
+            { name: "Ruchkar Mejwani", language: "Marathi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UC2Voa6RLYJcBNErjs9PIE3g", isYoutube: true },
+            { name: "Fit Tuber", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCYC6VEEqE-5r0O-A8N6zB3g", isYoutube: true }
+          ]
+        }
+      ]
     }
   ];
 
@@ -607,11 +877,6 @@
 
   function renderSectionContent(sectionEl, section) {
     section.categories.forEach(cat => {
-      const catHeader = document.createElement('div');
-      catHeader.className = 'category-title';
-      catHeader.innerText = cat.title;
-      sectionEl.appendChild(catHeader);
-
       if (cat.injectTip) {
         const tipSection = document.createElement('div');
         tipSection.className = 'feed-section';
@@ -655,7 +920,7 @@
         fetch(rss2jsonUrl + encodeURIComponent(feed.url))
           .then(response => response.json())
           .then(data => {
-            grid.innerHTML = ''; 
+            grid.innerHTML = '';
 
             if (data.status !== 'ok') {
               grid.innerHTML = '<p>Failed to load feed. The publisher may have restricted access.</p>';
@@ -663,59 +928,14 @@
             }
 
             const unreadItems = data.items.filter(item => !readArticles.includes(item.link));
-            const itemsToDisplay = unreadItems.slice(0, 6);
 
-            if(itemsToDisplay.length === 0) {
+            if (unreadItems.length === 0) {
                grid.innerHTML = '<p>You are all caught up! No new articles right now.</p>';
                return;
             }
 
-            itemsToDisplay.forEach(item => {
-              const card = document.createElement('div');
-              card.className = 'card';
-              card.setAttribute('data-link', item.link);
-
-              let tempDiv = document.createElement("div");
-              tempDiv.innerHTML = item.description;
-              let cleanText = tempDiv.textContent || tempDiv.innerText || "";
-              
-              let wordsArray = cleanText.trim().split(/\s+/).filter(word => word.length > 0);
-              let summary = "";
-              
-              if (wordsArray.length > 100) {
-                summary = wordsArray.slice(0, 100).join(" ") + " ...";
-              } else {
-                summary = wordsArray.join(" ");
-              }
-              
-              if (summary.trim() === "" || summary === "...") {
-                 summary = "Tap below to view the full text or video directly from the source.";
-              }
-
-              let buttonText = feed.isYoutube ? "Open Original Video" : "Read Original Source";
-
-              const articleData = {
-                 title: item.title,
-                 link: item.link,
-                 summary: summary,
-                 buttonText: buttonText
-              };
-              
-              const safeArticleData = encodeURIComponent(JSON.stringify(articleData));
-
-              card.innerHTML = `
-                <div class="card-body">
-                  <h3>${item.title}</h3>
-                  <p>${summary}</p>
-                </div>
-                <div class="card-actions">
-                  <button class="btn-sm btn-dismiss" data-link="${item.link}">Hide</button>
-                  <button class="btn-sm btn-save" data-article="${safeArticleData}">Save</button>
-                  <a href="${getTranslatedLink(item.link, feed.isYoutube)}" target="_blank" class="btn-sm read-original" data-link="${item.link}">${buttonText}</a>
-                </div>
-              `;
-              grid.appendChild(card);
-            });
+            feedPageState[safeId] = { items: unreadItems, displayed: 0, feed: feed };
+            renderFeedBatch(grid, safeId);
           })
           .catch(error => {
             grid.innerHTML = '<p>Error fetching data. Check your network connection.</p>';
@@ -731,8 +951,113 @@
     return 'https://translate.google.com/translate?sl=auto&tl=' + tl + '&u=' + encodeURIComponent(link);
   }
 
+  function renderFeedBatch(grid, stateKey) {
+    var state = feedPageState[stateKey];
+    if (!state) return;
+    var items = state.items;
+    var displayed = state.displayed;
+    var feed = state.feed;
+    var batch = items.slice(displayed, displayed + BATCH_SIZE);
+    if (!batch.length) {
+      grid.innerHTML = '<p style="font-family:\'IBM Plex Mono\',monospace;font-size:12px;text-align:center;padding:20px 0;">All caught up! No more articles.</p>';
+      return;
+    }
+    var frag = document.createDocumentFragment();
+    batch.forEach(function(item) {
+      var tempDiv = document.createElement("div");
+      tempDiv.innerHTML = item.description;
+      var cleanText = tempDiv.textContent || tempDiv.innerText || "";
+      var words = cleanText.trim().split(/\s+/).filter(function(w) { return w.length > 0; });
+      var summary = "";
+      if (words.length <= 500) {
+        summary = words.join(" ");
+      } else {
+        var sentences = cleanText.match(/[^.!?]*[.!?]+/g) || [cleanText];
+        var kept = [], count = 0;
+        for (var si = 0; si < sentences.length; si++) {
+          var sw = sentences[si].trim().split(/\s+/).filter(function(w) { return w.length > 0; });
+          if (count + sw.length > 500) break;
+          kept.push(sentences[si].trim());
+          count += sw.length;
+        }
+        summary = kept.join(" ");
+      }
+      if (summary.trim() === "") {
+        summary = "Tap below to view the full text or video directly from the source.";
+      }
+      var timeAgo = '';
+      if (item.pubDate) {
+        var pubDate = new Date(item.pubDate);
+        var now = new Date();
+        var diffMs = now - pubDate;
+        var diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        var diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        if (diffHours < 1) timeAgo = 'Just now';
+        else if (diffHours < 24) timeAgo = diffHours + 'h ago';
+        else timeAgo = diffDays + 'd ago';
+      }
+      var feedItem = document.createElement('div');
+      feedItem.className = 'feed-item';
+      feedItem.setAttribute('data-link', item.link);
+      var safeTitle = item.title.replace(/"/g, '&quot;');
+      var ytAttr = feed.isYoutube ? ' data-isyoutube="true"' : '';
+      feedItem.innerHTML =
+        '<span class="headline reader-trigger" data-url="' + item.link + '" data-title="' + safeTitle + '" data-feed="' + feed.name + '" data-date="' + (item.pubDate || '') + '"' + ytAttr + '>' + item.title + '</span>' +
+        '<p class="description">' + summary + '</p>' +
+        '<div class="meta">' +
+          '<span>' + timeAgo + ' — ' + feed.name + '</span>' +
+          '<button class="view-orig-btn" onclick="window.open(\'' + getTranslatedLink(item.link, feed.isYoutube) + '\',\'_blank\')">↗ Original site</button>' +
+        '</div>';
+      frag.appendChild(feedItem);
+    });
+    grid.appendChild(frag);
+    var newDisplayed = displayed + batch.length;
+    var remaining = items.length - newDisplayed;
+    state.displayed = newDisplayed;
+    var oldWrap = grid.querySelector('.load-more-wrap');
+    if (oldWrap) oldWrap.remove();
+    var wrap = document.createElement('div');
+    wrap.className = 'load-more-wrap';
+    if (remaining > 0) {
+      var btn = document.createElement('button');
+      btn.className = 'load-more-btn';
+      btn.setAttribute('data-statekey', stateKey);
+      btn.innerHTML = '↓ Load more <span style="opacity:0.6;font-weight:400;">(clears read · ' + remaining + ' remaining)</span>';
+      wrap.appendChild(btn);
+    } else {
+      var indicator = document.createElement('div');
+      indicator.className = 'load-more-indicator';
+      indicator.setAttribute('data-statekey', stateKey);
+      indicator.innerHTML = '✓ All caught up · <span style="text-decoration:underline;">clear read</span>';
+      wrap.appendChild(indicator);
+    }
+    grid.appendChild(wrap);
+  }
+
+  // Load-more / clear-read click handler
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest) return;
+    var trigger = e.target.closest('.load-more-btn, .load-more-indicator');
+    if (!trigger) return;
+    var stateKey = trigger.getAttribute('data-statekey');
+    var state = feedPageState[stateKey];
+    if (!state) return;
+    var grid = document.getElementById(stateKey);
+    if (!grid) return;
+    var items = grid.querySelectorAll('.feed-item');
+    items.forEach(function(el) {
+      var link = el.getAttribute('data-link');
+      if (link && readArticles.indexOf(link) === -1) {
+        readArticles.push(link);
+      }
+    });
+    localStorage.setItem('readArticles', JSON.stringify(readArticles));
+    grid.innerHTML = '';
+    renderFeedBatch(grid, stateKey);
+  });
+
   const btnContainer = document.getElementById('section-buttons');
-  const sectionColors = ['#e07a5f', '#81b29a', '#3d5a80', '#9b5de5'];
+  const sectionColors = ['#e07a5f', '#81b29a', '#3d5a80', '#d4a373', '#9b5de5', '#e9c46a'];
 
   mainSections.forEach((section, index) => {
     const btn = document.createElement('button');
@@ -807,6 +1132,291 @@
       gtCombo.dispatchEvent(new Event('change'));
     }
   });
+
+  // ==========================================
+  // ARTICLE READER PANEL
+  // ==========================================
+  const READER_TIMEOUT_MS = 5000;
+  let _readerArticleUrl = '';
+  let _readerFontSize = 17;
+
+  function escapeHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  function xhrFetch(url, timeoutMs) {
+    return new Promise(function(resolve, reject) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', url, true);
+      xhr.timeout = timeoutMs || READER_TIMEOUT_MS;
+      xhr.setRequestHeader('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
+      xhr.onload = function() { resolve(xhr.responseText); };
+      xhr.onerror = function() { reject(new Error('XHR failed')); };
+      xhr.ontimeout = function() { reject(new Error('Timeout')); };
+      xhr.send();
+    });
+  }
+
+  function getYoutubeVideoId(url) {
+    var m;
+    if ((m = url.match(/youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/))) return m[1];
+    if ((m = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/))) return m[1];
+    if ((m = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/))) return m[1];
+    if ((m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/))) return m[1];
+    if ((m = url.match(/youtube\.com\/live\/([a-zA-Z0-9_-]{11})/))) return m[1];
+    return null;
+  }
+
+  function openReader(url, title, feedName, pubDate, isYoutube) {
+    _readerArticleUrl = url;
+    var backdrop = document.getElementById('reader-backdrop');
+    var panel = document.getElementById('reader-panel');
+    backdrop.classList.add('active');
+    panel.classList.add('open');
+    document.getElementById('reader-source').textContent = feedName || 'Article';
+    var extLink = document.getElementById('reader-ext-link');
+    extLink.onclick = function() { window.open(getTranslatedLink(url, false), '_blank'); };
+    document.getElementById('reader-progress').style.width = '0%';
+    document.body.style.overflow = 'hidden';
+
+    var vid = getYoutubeVideoId(url);
+    if (vid) {
+      document.getElementById('reader-font-dec').style.display = 'none';
+      document.getElementById('reader-font-inc').style.display = 'none';
+      document.getElementById('reader-content').innerHTML =
+        '<div class="reader-video-wrap">' +
+          '<iframe class="reader-video-embed" src="https://www.youtube.com/embed/' + vid + '?rel=0&modestbranding=1&iv_load_policy=3&autoplay=1" allowfullscreen></iframe>' +
+        '</div>' +
+        '<h1 class="reader-article-title" style="padding:15px 20px 0">' + escapeHtml(title) + '</h1>';
+      var scrollEl = document.getElementById('reader-scroll');
+      scrollEl.scrollTop = 0;
+      return;
+    }
+
+    document.getElementById('reader-font-dec').style.display = '';
+    document.getElementById('reader-font-inc').style.display = '';
+    document.getElementById('reader-content').innerHTML = '<div class="reader-status">Loading article...</div>';
+    fetchArticleLocal(url, title, feedName, pubDate);
+  }
+
+  function closeReader() {
+    var backdrop = document.getElementById('reader-backdrop');
+    var panel = document.getElementById('reader-panel');
+    backdrop.classList.remove('active');
+    panel.classList.remove('open');
+    document.body.style.overflow = '';
+    _readerArticleUrl = '';
+  }
+
+  function fetchArticleLocal(url, title, feedName, pubDate) {
+    var proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
+    var fallbackUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+
+    function tryFetch(primary, secondary) {
+      xhrFetch(primary, READER_TIMEOUT_MS).then(function(html) {
+        var extracted = extractWebArticle(html, url);
+        if (extracted && extracted.length > 300) {
+          renderArticleContent(extracted, title, feedName, pubDate, url);
+        } else {
+          throw new Error('Content too short');
+        }
+      }).catch(function() {
+        if (secondary) {
+          tryFetch(secondary, null);
+        } else {
+          renderArticleFallback(url, title, feedName, pubDate);
+        }
+      });
+    }
+
+    tryFetch(proxyUrl, fallbackUrl);
+  }
+
+  function extractWebArticle(html, baseUrl) {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(html, 'text/html');
+    var article = extractMainContent(doc, baseUrl, false);
+    if (!article || article.length < 300) {
+      article = extractMainContent(doc, baseUrl, true);
+    }
+    return article;
+  }
+
+  function extractMainContent(doc, baseUrl, aggressive) {
+    var selectors = [
+      'article[class*="article"]', 'article[class*="story"]', 'article[class*="post"]',
+      'article[class*="content"]', 'article[class*="main"]', 'article[class*="single"]',
+      'article[class*="entry"]',
+      '[class*="article-body"]', '[class*="story-body"]', '[class*="post-content"]',
+      '[class*="entry-content"]', '[class*="article-content"]', '[class*="article__content"]',
+      '[class*="article_text"]', '[class*="story-text"]', '[class*="article-detail"]',
+      '[class*="main-content"]', '[class*="content-main"]', '[class*="field-item"]',
+      '[class*="article-full"]', '[class*="full-article"]',
+      '[property="articleBody"]', '[itemprop="articleBody"]',
+      'main', '[role="main"]', '.main-content', '#main-content',
+      '.post-body', '.entry-body', '.articleBody',
+      '.field--name-body', '.field-name-body',
+      'body'
+    ];
+
+    for (var i = 0; i < selectors.length; i++) {
+      var el = doc.querySelector(selectors[i]);
+      if (el) {
+        var clone = sanitizeHtml(el.cloneNode(true));
+        if (clone.textContent.trim().length > 300) {
+          return reflowArticleText(clone.innerHTML, baseUrl);
+        }
+      }
+    }
+    return null;
+  }
+
+  function sanitizeHtml(node) {
+    var removeSelectors = [
+      'script', 'style', 'noscript', 'iframe', 'nav', 'header', 'footer',
+      '.ad', '.ads', '.adsense', '.advertisement', '.ad-container',
+      '[class*="ad-"]', '[class*="ad_"]', '[id*="ad-"]', '[id*="ad_"]',
+      '.social', '.share', '.social-share', '.sharing', '.social-links',
+      '.related', '.related-posts', '.recommended', '.recommendations',
+      '.comments', '#comments', '.comment', '.comment-form',
+      '.sidebar', '#sidebar', '.widget', '.widget-area',
+      '.newsletter', '.subscribe', '.signup', '.mailchimp',
+      '.cookie', '.cookies', '.consent', '.gdpr',
+      '.popup', '.modal', '.overlay', '.lightbox',
+      '.nav', '.navigation', '.menu', '.navbar', '.header',
+      '.footer', '.site-footer', '.page-footer',
+      '.breadcrumb', '.breadcrumbs', '.pagination',
+      '.author', '.byline', '.meta', '.post-meta', '.entry-meta',
+      '.tags', '.categories', '.tag-list',
+      '.published', '.updated', '.date',
+      '.video', '.video-container', '.embed',
+      '.gallery', '.carousel', '.slider',
+      '.hidden', '.visually-hidden', '.screen-reader-text'
+    ];
+
+    for (var i = 0; i < removeSelectors.length; i++) {
+      try {
+        var els = node.querySelectorAll(removeSelectors[i]);
+        for (var j = 0; j < els.length; j++) {
+          els[j].remove();
+        }
+      } catch(e) {}
+    }
+
+    removeEmptyNodes(node);
+    return node;
+  }
+
+  function removeEmptyNodes(node) {
+    var children = Array.from(node.childNodes);
+    for (var i = 0; i < children.length; i++) {
+      var child = children[i];
+      if (child.nodeType === 1) {
+        removeEmptyNodes(child);
+        if (!child.textContent.trim() && child.children.length === 0) {
+          child.remove();
+        }
+      }
+    }
+  }
+
+  function reflowArticleText(html, baseUrl) {
+    var temp = document.createElement('div');
+    temp.innerHTML = html;
+    var blocks = [];
+
+    function walk(n) {
+      if (n.nodeType === 3) {
+        var t = n.textContent.trim();
+        if (t) blocks.push(t);
+      } else if (n.nodeType === 1) {
+        var tag = n.tagName.toLowerCase();
+        if (['p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'li', 'figcaption'].indexOf(tag) !== -1) {
+          var inner = n.innerHTML.trim();
+          if (inner) blocks.push('<' + tag + '>' + inner + '</' + tag + '>');
+        } else if (['img', 'figure', 'picture', 'table', 'pre', 'code'].indexOf(tag) !== -1) {
+          blocks.push(n.outerHTML);
+        } else {
+          var t2 = n.textContent.trim();
+          if (t2) blocks.push(t2);
+        }
+      }
+    }
+
+    Array.from(temp.childNodes).forEach(walk);
+    return blocks.join('\n\n');
+  }
+
+  function renderArticleContent(articleHtml, title, feedName, pubDate, url) {
+    var content = document.getElementById('reader-content');
+    var metaParts = [];
+    if (feedName) metaParts.push(feedName);
+    if (pubDate) {
+      try {
+        var d = new Date(pubDate);
+        metaParts.push(d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }));
+      } catch(e) {}
+    }
+    var safeTitle = escapeHtml(title);
+    _readerFontSize = 17;
+    content.innerHTML =
+      '<h1 class="reader-article-title">' + safeTitle + '</h1>' +
+      '<div class="reader-article-meta">' + metaParts.join(' &middot; ') + '</div>' +
+      '<div class="reader-body" style="--reader-font-sz:17px">' + articleHtml + '</div>';
+  }
+
+  function renderArticleFallback(url, title, feedName, pubDate) {
+    var content = document.getElementById('reader-content');
+    var link = getTranslatedLink(url, false);
+    var safeTitle = escapeHtml(title);
+    content.innerHTML =
+      '<div class="reader-status">' +
+      'Could not extract article content automatically.<br><br>' +
+      '<strong>' + safeTitle + '</strong><br><br>' +
+      '<a href="' + link + '" target="_blank" style="text-decoration:underline;font-weight:bold;">View original article &rarr;</a>' +
+      '</div>';
+  }
+
+  function setReaderProgress() {
+    var scrollEl = document.getElementById('reader-scroll');
+    var progress = document.getElementById('reader-progress');
+    var pct = (scrollEl.scrollTop / (scrollEl.scrollHeight - scrollEl.clientHeight)) * 100;
+    progress.style.width = Math.min(100, Math.max(0, pct)) + '%';
+  }
+
+  // --- Reader event wiring ---
+  document.addEventListener('click', function(e) {
+    var trigger = e.target.closest('.reader-trigger');
+    if (trigger) {
+      var url = trigger.getAttribute('data-url');
+      if (url) {
+        openReader(url, trigger.getAttribute('data-title'), trigger.getAttribute('data-feed'), trigger.getAttribute('data-date'), trigger.getAttribute('data-isyoutube') === 'true');
+      }
+    }
+  });
+
+  document.getElementById('reader-close-btn').addEventListener('click', closeReader);
+  document.getElementById('reader-backdrop').addEventListener('click', closeReader);
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeReader();
+  });
+
+  document.getElementById('reader-font-dec').addEventListener('click', function() {
+    _readerFontSize = Math.max(13, _readerFontSize - 1);
+    var body = document.querySelector('.reader-body');
+    if (body) body.style.setProperty('--reader-font-sz', _readerFontSize + 'px');
+  });
+
+  document.getElementById('reader-font-inc').addEventListener('click', function() {
+    _readerFontSize = Math.min(24, _readerFontSize + 1);
+    var body = document.querySelector('.reader-body');
+    if (body) body.style.setProperty('--reader-font-sz', _readerFontSize + 'px');
+  });
+
+  document.getElementById('reader-scroll').addEventListener('scroll', setReaderProgress);
 </script>
 
 </body>
