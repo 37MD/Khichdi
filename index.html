@@ -571,6 +571,68 @@
   }
 
   // ==========================================
+  // YOUTUBE SERIES FETCH LOGIC
+  // ==========================================
+  function fetchSeriesEpisodes() {
+    const url = document.getElementById('series-tracker-input').value.trim();
+    if (!url) {
+      alert("Please paste a valid YouTube Playlist or Channel link.");
+      return;
+    }
+    
+    let rssUrl = '';
+    const playlistMatch = url.match(/[?&]list=([^&]+)/);
+    if (playlistMatch) {
+      rssUrl = 'https://www.youtube.com/feeds/videos.xml?playlist_id=' + playlistMatch[1];
+    } else if (url.includes('channel/')) {
+      const channelMatch = url.match(/channel\/([^/?]+)/);
+      if (channelMatch) {
+        rssUrl = 'https://www.youtube.com/feeds/videos.xml?channel_id=' + channelMatch[1];
+      }
+    } else if (url.includes('user/')) {
+      const userMatch = url.match(/user\/([^/?]+)/);
+      if (userMatch) {
+        rssUrl = 'https://www.youtube.com/feeds/videos.xml?user=' + userMatch[1];
+      }
+    } else if (url.includes('@')) {
+       alert("Please use a Playlist Link (contains 'list=...') or Channel ID link instead of a handle (@name).");
+       return;
+    } else {
+      alert("Could not recognize playlist or channel ID from the link. Please ensure it's a valid YouTube playlist or channel URL.");
+      return;
+    }
+
+    const resultsGrid = document.getElementById('series-results-grid');
+    resultsGrid.innerHTML = '<p class="loading">Fetching episodes...</p>';
+
+    fetch(rss2jsonUrl + encodeURIComponent(rssUrl))
+      .then(response => response.json())
+      .then(data => {
+        if (data.status !== 'ok') {
+          resultsGrid.innerHTML = '<p style="font-weight:bold; text-align:center;">Could not fetch episodes. The publisher may have restricted access.</p>';
+          return;
+        }
+        
+        let html = '<h3 style="margin-top:0; padding-bottom:10px; border-bottom:2px solid #000; font-size:16px;">&#127902; ' + data.feed.title + '</h3>';
+        
+        data.items.forEach(item => {
+          const safeTitle = item.title.replace(/"/g, '&quot;');
+          html += '<div class="feed-item" style="margin-bottom: 15px; padding-bottom: 15px;">' +
+              '<span class="headline reader-trigger" data-url="' + item.link + '" data-title="' + safeTitle + '" data-feed="' + data.feed.title + '" data-date="' + item.pubDate + '" data-isyoutube="true">' + item.title + '</span>' +
+              '<div class="meta" style="margin-top:8px;">' +
+                '<span>' + new Date(item.pubDate).toLocaleDateString() + '</span>' +
+              '</div>' +
+            '</div>';
+        });
+        
+        resultsGrid.innerHTML = html;
+      })
+      .catch(error => {
+        resultsGrid.innerHTML = '<p style="font-weight:bold; text-align:center;">Error fetching data. Check your network connection.</p>';
+      });
+  }
+
+  // ==========================================
   // TRAVEL DISCOVERY LOGIC
   // ==========================================
   function searchTravel(type) {
@@ -754,7 +816,7 @@
     return array[randomIndex];
   }
 
-  // Complete array of all sections including the new Travel News section
+  // Complete array of all sections including the new YouTube Series section
   const mainSections = [
     {
       title: "News",
@@ -940,6 +1002,43 @@
       ]
     },
     {
+      title: "YouTube Series",
+      categories: [
+        {
+          title: "Search & Fetch Episodes",
+          injectTip: false,
+          injectSeriesTool: true,
+          feeds: []
+        },
+        {
+          title: "Short Stories & Series",
+          injectTip: false,
+          feeds: [
+            { name: "Pocket Films", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?user=pocketfilms", isYoutube: true },
+            { name: "Royal Select", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?user=RoyalSelect", isYoutube: true },
+            { name: "Large Short Films", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?user=LargeShortFilms", isYoutube: true },
+            { name: "TVF (The Viral Fever)", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?user=TheViralFeverVideos", isYoutube: true },
+            { name: "Dice Media", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?user=DiceMediaIndia", isYoutube: true },
+            { name: "Terribly Tiny Tales", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?user=terriblytinytales", isYoutube: true },
+            { name: "The Screen Patti", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?user=TheScreenPatti", isYoutube: true },
+            { name: "Girliyapa", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?user=Girliyapa", isYoutube: true },
+            { name: "FilterCopy", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?user=FilterCopy", isYoutube: true },
+            { name: "The Timeliners", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?user=TheTimeliners", isYoutube: true },
+            { name: "RVCJ Media", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?user=RVCJMedia", isYoutube: true },
+            { name: "Six Sigma Films", language: "Hindi/Marathi", url: "https://www.youtube.com/feeds/videos.xml?user=SixSigmaFilms", isYoutube: true },
+            { name: "HumaraMovie", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?user=humaramovie", isYoutube: true },
+            { name: "Gorilla Shorts", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?user=GorillaShorts", isYoutube: true },
+            { name: "Natak Pictures", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?user=NatakPictures", isYoutube: true },
+            { name: "Shudh Desi Endings", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?user=ShudhDesiEndings", isYoutube: true },
+            { name: "Shortfundly", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?user=Shortfundly", isYoutube: true },
+            { name: "Web Talkies", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?user=WebTalkies", isYoutube: true },
+            { name: "BhaDiPa", language: "Marathi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UC6P0P6Q-K1H0_v1vHw6TzXg", isYoutube: true },
+            { name: "Karbhari", language: "Marathi", url: "https://www.youtube.com/feeds/videos.xml?user=Karbhari", isYoutube: true }
+          ]
+        }
+      ]
+    },
+    {
       title: "YouTube Videos",
       categories: [
         {
@@ -1067,6 +1166,74 @@
               <button class="flipkart-btn" onclick="searchPortal('flipkart')">Flipkart</button>
               <button class="myntra-btn" onclick="searchPortal('myntra')">Myntra</button>
             </div>
+          </div>
+        `;
+        sectionEl.appendChild(toolsSection);
+      }
+
+      if (cat.injectSeriesTool) {
+        const toolsSection = document.createElement('div');
+        toolsSection.className = 'feed-section';
+        toolsSection.innerHTML = `
+          <style>
+            .series-tracker-box {
+              border: 2px solid #000;
+              padding: 16px;
+              margin-bottom: 20px;
+              background: #f5efe1;
+            }
+            .series-tracker-box h3 {
+              font-family: 'IBM Plex Mono', monospace;
+              font-size: 10px;
+              text-transform: uppercase;
+              letter-spacing: 0.1em;
+              margin: 0 0 10px;
+            }
+            .series-tracker-box label {
+              font-family: 'IBM Plex Mono', monospace;
+              font-size: 11px;
+              font-weight: bold;
+              display: block;
+              margin-bottom: 4px;
+            }
+            .series-tracker-box input {
+              width: 100%;
+              padding: 10px;
+              border: 2px solid #000;
+              font-size: 14px;
+              box-sizing: border-box;
+              margin-bottom: 10px;
+              background: #fff;
+            }
+            .series-tracker-box .btn-row {
+              display: flex;
+              gap: 8px;
+              flex-wrap: wrap;
+            }
+            .series-tracker-box .btn-row button {
+              flex: 1;
+              min-width: 100px;
+              padding: 10px;
+              border: 2px solid #000;
+              font-weight: bold;
+              cursor: pointer;
+              font-size: 12px;
+              text-transform: uppercase;
+              background: #e07a5f;
+              transition: background 0.2s;
+            }
+            .series-tracker-box .btn-row button:hover {
+              filter: brightness(0.9);
+            }
+          </style>
+          <div class="series-tracker-box">
+            <h3>&#127902; Search & Fetch Episodes</h3>
+            <label for="series-tracker-input">Paste YouTube Playlist or Channel Link:</label>
+            <input type="text" id="series-tracker-input" placeholder="e.g. https://www.youtube.com/playlist?list=...">
+            <div class="btn-row">
+              <button onclick="fetchSeriesEpisodes()">&#128269; Fetch Episodes</button>
+            </div>
+            <div id="series-results-grid" class="grid" style="margin-top: 15px; padding-top: 15px; border-top: 2px dashed #000;"></div>
           </div>
         `;
         sectionEl.appendChild(toolsSection);
@@ -1234,7 +1401,7 @@
   });
 
   const btnContainer = document.getElementById('section-buttons');
-  const sectionColors = ['#f0a08a', '#b8d5c6', '#7ba0c4', '#e8cca8', '#d4b0f0', '#f2dca0'];
+  const sectionColors = ['#f0a08a', '#b8d5c6', '#7ba0c4', '#e8cca8', '#d4b0f0', '#f2dca0', '#81b29a'];
 
   mainSections.forEach((section, index) => {
     const btn = document.createElement('button');
