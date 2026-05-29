@@ -1368,8 +1368,9 @@
 
       embedHtml += '<h1 class="reader-article-title" style="padding:15px 20px 0">' + escapeHtml(title) + '</h1>';
       
-      // Added Landscape Button + Fallback Button
+      // Added Back Button + Landscape Button + Fallback Button
       embedHtml += '<div style="text-align:center; padding: 25px 20px;">' +
+                   '<button onclick="closeReader()" style="background:#e9c46a; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%; margin-bottom:15px;">&larr; Back to Feed</button><br>' +
                    '<button onclick="makeLandscape()" style="background:#a8dadc; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%; margin-bottom:15px;">&#10521; View in Landscape (Fullscreen)</button><br>' +
                    '<button onclick="window.open(\'' + url + '\', \'_blank\')" style="background:#e07a5f; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%;">&#9654; Open in YouTube App</button>' +
                    '<p style="font-size:12px; margin-top:12px; color:#000000;">(Tap above if the video owner disabled embedded playback)</p>' +
@@ -1393,6 +1394,7 @@
         '</div>' +
         '<h1 class="reader-article-title" style="padding:15px 20px 0">' + escapeHtml(title) + '</h1>' +
         '<div style="text-align:center; padding: 25px 20px;">' +
+           '<button onclick="closeReader()" style="background:#e9c46a; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%; margin-bottom:15px;">&larr; Back to Feed</button><br>' +
            '<button onclick="makeLandscape()" style="background:#a8dadc; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%; margin-bottom:15px;">&#10521; View in Landscape (Fullscreen)</button><br>' +
            '<button onclick="window.open(\'' + channelUrl + '\', \'_blank\')" style="background:#e07a5f; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%;">&#9654; Open in YouTube App</button>' +
         '</div>';
