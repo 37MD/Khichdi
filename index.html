@@ -1895,23 +1895,23 @@
     if (vid || isYoutube) {
       document.getElementById('reader-font-dec').style.display = 'none';
       document.getElementById('reader-font-inc').style.display = 'none';
-      document.getElementById('video-float-back').style.display = 'block';
-      document.querySelector('.reader-topbar').style.display = 'none';
-      document.getElementById('reader-progress').style.display = 'none';
-      document.getElementById('reader-scroll').style.padding = '0';
 
-      var embedHtml;
+      var embedHtml = '<div class="reader-video-wrap">';
       if (vid) {
-        embedHtml = renderYtPlayer(vid);
+        embedHtml += '<iframe class="reader-video-embed" src="' + getYtPlayerSrc(vid) + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
       } else {
-        embedHtml =
-          '<div style="padding:40px 20px; text-align:center; font-family:\'IBM Plex Mono\',monospace; font-size:12px;">Video preview not available.</div>' +
-          '<h1 class="reader-article-title" style="padding:15px 20px 0">' + escapeHtml(title) + '</h1>' +
-          '<div style="text-align:center; padding:20px;">' +
-            '<button onclick="closeReader()" style="background:#e9c46a;color:#000;border:2px solid #000;padding:12px 20px;font-weight:bold;font-size:16px;cursor:pointer;width:100%;margin-bottom:12px;">&larr; Back to Feed</button><br>' +
-            '<button onclick="window.open(\'' + url + '\',\'_blank\')" style="background:#e07a5f;color:#000;border:2px solid #000;padding:12px 20px;font-weight:bold;font-size:16px;cursor:pointer;width:100%;">&#9654; Open in YouTube App</button>' +
-          '</div>';
+        embedHtml += '<div style="width:100%; height:100%; position:absolute; top:0; left:0; display:flex; align-items:center; justify-content:center; background:#e0e1dd; color:#000000; font-family:\'IBM Plex Mono\', monospace; font-size:12px; border:2px solid #000000; box-sizing:border-box;">Video preview not available</div>';
       }
+      embedHtml += '</div>';
+
+      embedHtml += '<h1 class="reader-article-title" style="padding:15px 20px 0">' + escapeHtml(title) + '</h1>';
+
+      embedHtml += '<div style="text-align:center; padding: 25px 20px;">' +
+                   '<button onclick="closeReader()" style="background:#e9c46a; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%; margin-bottom:15px;">&larr; Back to Feed</button><br>' +
+                   '<button onclick="makeLandscape()" style="background:#a8dadc; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%; margin-bottom:15px;">&#10521; View in Landscape (Fullscreen)</button><br>' +
+                   '<button onclick="window.open(\'' + url + '\', \'_blank\')" style="background:#e07a5f; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%;">&#9654; Open in YouTube App</button>' +
+                   '<p style="font-size:12px; margin-top:12px; color:#000000;">(Tap above if the video owner disabled embedded playback)</p>' +
+                   '</div>';
 
       document.getElementById('reader-content').innerHTML = embedHtml;
       var scrollEl = document.getElementById('reader-scroll');
