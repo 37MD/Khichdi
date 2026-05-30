@@ -95,6 +95,15 @@
     font-size: 0.9em;
     cursor: pointer;
   }
+  .masthead-controls #yt-player-select {
+    background: #a8dadc;
+    border: 2px solid #000;
+    padding: 6px 8px;
+    font-weight: bold;
+    font-size: 0.8em;
+    cursor: pointer;
+    max-width: 110px;
+  }
   .masthead-controls .reset-small-btn {
     background: #d4a373;
     border: 2px solid #000;
@@ -652,6 +661,11 @@
         <option value="marathi">Marathi</option>
         <option value="hindi">Hindi</option>
         <option value="english">English</option>
+      </select>
+      <select id="yt-player-select">
+        <option value="youtube">YouTube</option>
+        <option value="invidious">Invidious</option>
+        <option value="piped">Piped</option>
       </select>
       <button class="reset-small-btn" id="reset-btn">&#8634; Reset</button>
     </div>
@@ -1605,6 +1619,42 @@
     return 'https://translate.google.com/translate?sl=auto&tl=' + tl + '&u=' + encodeURIComponent(link);
   }
 
+  // ==========================================
+  // YOUTUBE PLAYER SELECTOR
+  // ==========================================
+  var YT_PLAYER_INSTANCES = {
+    youtube:   { name: 'YouTube',        embedBase: 'https://www.youtube.com/embed/' },
+    invidious: { name: 'Invidious',      embedBase: 'https://yt.cdaut.de/embed/' },
+    piped:     { name: 'Piped',          embedBase: 'https://piped.video/embed/' }
+  };
+
+  var _ytPlayerPref = localStorage.getItem('khichdi_yt_player') || 'youtube';
+
+  function setYtPlayer(playerId) {
+    _ytPlayerPref = playerId;
+    localStorage.setItem('khichdi_yt_player', playerId);
+  }
+
+  function getYtPlayerSrc(vid) {
+    var inst = YT_PLAYER_INSTANCES[_ytPlayerPref] || YT_PLAYER_INSTANCES.youtube;
+    var params = _ytPlayerPref === 'youtube'
+      ? '?rel=0&playsinline=1'
+      : '?rel=0&autoplay=1&playsinline=1&controls=0&iv_load_policy=3&modestbranding=1&disablekb=1';
+    return inst.embedBase + vid + params;
+  }
+
+  function renderYtPlayer(vid) {
+    var src = getYtPlayerSrc(vid);
+    return '<div class="reader-video-wrap">' +
+        '<iframe class="reader-video-embed" src="' + src + '"' +
+        ' frameborder="0"' +
+        ' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"' +
+        ' allowfullscreen' +
+        ' referrerpolicy="no-referrer">' +
+        '</iframe>' +
+      '</div>';
+  }
+
   function renderFeedBatch(grid, stateKey) {
     var state = feedPageState[stateKey];
     if (!state) return;
@@ -1783,6 +1833,15 @@
     }
   });
 
+  (function() {
+    var sel = document.getElementById('yt-player-select');
+    var saved = localStorage.getItem('khichdi_yt_player') || 'youtube';
+    sel.value = saved;
+    sel.addEventListener('change', function() {
+      setYtPlayer(this.value);
+    });
+  })();
+
   document.getElementById('reset-btn').addEventListener('click', resetHistory);
 
   // ==========================================
@@ -1836,24 +1895,23 @@
     if (vid || isYoutube) {
       document.getElementById('reader-font-dec').style.display = 'none';
       document.getElementById('reader-font-inc').style.display = 'none';
-      
-      var embedHtml = '<div class="reader-video-wrap">';
-      if (vid) {
-        embedHtml += '<iframe class="reader-video-embed" src="https://www.youtube.com/embed/' + vid + '?rel=0&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
-      } else {
-        embedHtml += '<div style="width:100%; height:100%; position:absolute; top:0; left:0; display:flex; align-items:center; justify-content:center; background:#e0e1dd; color:#000000; font-family:\'IBM Plex Mono\', monospace; font-size:12px; border:2px solid #000000; box-sizing:border-box;">Video preview not available</div>';
-      }
-      embedHtml += '</div>';
+      document.getElementById('video-float-back').style.display = 'block';
+      document.querySelector('.reader-topbar').style.display = 'none';
+      document.getElementById('reader-progress').style.display = 'none';
+      document.getElementById('reader-scroll').style.padding = '0';
 
-      embedHtml += '<h1 class="reader-article-title" style="padding:15px 20px 0">' + escapeHtml(title) + '</h1>';
-      
-      // Added Back Button + Landscape Button + Fallback Button
-      embedHtml += '<div style="text-align:center; padding: 25px 20px;">' +
-                   '<button onclick="closeReader()" style="background:#e9c46a; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%; margin-bottom:15px;">&larr; Back to Feed</button><br>' +
-                   '<button onclick="makeLandscape()" style="background:#a8dadc; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%; margin-bottom:15px;">&#10521; View in Landscape (Fullscreen)</button><br>' +
-                   '<button onclick="window.open(\'' + url + '\', \'_blank\')" style="background:#e07a5f; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%;">&#9654; Open in YouTube App</button>' +
-                   '<p style="font-size:12px; margin-top:12px; color:#000000;">(Tap above if the video owner disabled embedded playback)</p>' +
-                   '</div>';
+      var embedHtml;
+      if (vid) {
+        embedHtml = renderYtPlayer(vid);
+      } else {
+        embedHtml =
+          '<div style="padding:40px 20px; text-align:center; font-family:\'IBM Plex Mono\',monospace; font-size:12px;">Video preview not available.</div>' +
+          '<h1 class="reader-article-title" style="padding:15px 20px 0">' + escapeHtml(title) + '</h1>' +
+          '<div style="text-align:center; padding:20px;">' +
+            '<button onclick="closeReader()" style="background:#e9c46a;color:#000;border:2px solid #000;padding:12px 20px;font-weight:bold;font-size:16px;cursor:pointer;width:100%;margin-bottom:12px;">&larr; Back to Feed</button><br>' +
+            '<button onclick="window.open(\'' + url + '\',\'_blank\')" style="background:#e07a5f;color:#000;border:2px solid #000;padding:12px 20px;font-weight:bold;font-size:16px;cursor:pointer;width:100%;">&#9654; Open in YouTube App</button>' +
+          '</div>';
+      }
 
       document.getElementById('reader-content').innerHTML = embedHtml;
       var scrollEl = document.getElementById('reader-scroll');
@@ -1891,6 +1949,11 @@
   }
 
   function closeReader() {
+    document.getElementById('video-float-back').style.display = 'none';
+    var topbar = document.querySelector('.reader-topbar');
+    if (topbar) topbar.style.display = '';
+    document.getElementById('reader-progress').style.display = '';
+    document.getElementById('reader-scroll').style.padding = '';
     var backdrop = document.getElementById('reader-backdrop');
     var panel = document.getElementById('reader-panel');
     backdrop.classList.remove('active');
